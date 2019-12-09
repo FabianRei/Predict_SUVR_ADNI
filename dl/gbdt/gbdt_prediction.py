@@ -77,7 +77,21 @@ params['min_data_in_leaf'] = 9
 # params['boosting_type'] = 'dart'
 for i in range(2, 60, 2):
     params['learning_rate'] = 0.0001*i
-    cross_validation_gbdt(data, params, activations=True, cval_range=5, extra_folder='lr_2')
+    cross_validation_gbdt(data, params, activations=True, cval_range=5, extra_folder='lr_11_9')
+
+params['max_depth'] = 11
+params['min_data_in_leaf'] = 13
+# params['boosting_type'] = 'dart'
+for i in range(2, 60, 2):
+    params['learning_rate'] = 0.0001*i
+    cross_validation_gbdt(data, params, activations=True, cval_range=5, extra_folder='lr_11_13')
+
+params['max_depth'] = 9
+params['min_data_in_leaf'] = 13
+# params['boosting_type'] = 'dart'
+for i in range(2, 60, 2):
+    params['learning_rate'] = 0.0001*i
+    cross_validation_gbdt(data, params, activations=True, cval_range=5, extra_folder='lr_9_13')
 
 # for i in range(3, 18, 2):
 #     params['min_data_in_leaf'] = i
