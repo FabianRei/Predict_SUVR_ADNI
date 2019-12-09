@@ -12,7 +12,10 @@ from matplotlib import pyplot as plt
 from dl.gbdt.five_fold_cv import cross_validation_gbdt
 
 # in_path = r'C:\Users\Fabian\stanford\fed_learning\rsync\fl\rf_data_train_test.pickle'
-in_path = r'C:\Users\Fabian\stanford\fed_learning\rsync\fl\rf_data_train_test_crossval.pickle'
+if os.name == 'nt':
+    in_path = r'C:\Users\Fabian\stanford\fed_learning\rsync\fl\rf_data_train_test_crossval.pickle'
+else:
+    in_path = '/share/wandell/data/reith/gbdt/rf_data_train_test_crossval.pickle'
 with open(in_path, 'rb') as f:
     data = pickle.load(f)
 

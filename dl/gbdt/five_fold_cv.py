@@ -60,6 +60,7 @@ def save_results(res, activations, exclude='', extra_folder=''):
         res_csv_mean[k] = np.array([np.mean(v)])
     res_csv = pd.DataFrame.from_dict(res_csv)
     res_csv_mean = pd.DataFrame.from_dict(res_csv_mean)
+    print(res_csv_mean)
     res_csv.to_csv(os.path.join(out_dir, 'results.csv'))
     res_csv_mean.to_csv(os.path.join(out_dir, 'results_mean.csv'))
     with open(os.path.join(out_dir, 'params.txt'), 'w') as f:
