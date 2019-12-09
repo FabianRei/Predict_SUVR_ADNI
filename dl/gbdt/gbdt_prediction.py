@@ -68,7 +68,7 @@ params['max_depth'] = 11
 # cross_validation_gbdt(data, params, activations=True, cval_range=5)
 sub_processes = []
 for i in range(1, 24):
-    params['num_iterations'] = i*0.0005
+    params['learning_rate'] = i*0.0005
     sub_proc = mp.Process(target=cross_validation_gbdt, args=[data, params], kwargs={'activations': True,
                                                                                      'cval_range': 5,
                                                                                      'extra_folder': 'lr_search'})
