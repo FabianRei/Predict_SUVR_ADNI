@@ -64,15 +64,15 @@ params = {
 params['learning_rate'] = 0.0045
 params['num_iterations'] = 4000
 params['min_data_in_leaf'] = 9
-params['max_depth'] = 9 # 9 also quite good
+params['max_depth'] = 11 # 11 also quite good
 # cross_validation_gbdt(data, params, activations=True, cval_range=5)
-sub_processes = []
-for i in range(3, 21, 3):
-    params['max_depth'] = i
-    print(params)
-    cross_validation_gbdt(data, params, activations=True, cval_range=5, extra_folder='depth_search_cv')
+# sub_processes = []
+# for i in range(3, 21, 3):
+#     params['max_depth'] = i
+#     print(params)
+#     cross_validation_gbdt(data, params, activations=True, cval_range=5, extra_folder='depth_search_cv')
 
-params['max_depth'] = 9
+params['max_depth'] = 11
 for i in range(3, 18, 2):
     params['min_data_in_leaf'] = i
     print(params)
