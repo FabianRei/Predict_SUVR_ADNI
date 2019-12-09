@@ -64,7 +64,7 @@ params = {
 params['learning_rate'] = 0.0045
 params['num_iterations'] = 4000
 params['min_data_in_leaf'] = 9
-params['max_depth'] = 11
+params['max_depth'] = 9
 # cross_validation_gbdt(data, params, activations=True, cval_range=5)
 sub_processes = []
 for i in range(1, 24):
