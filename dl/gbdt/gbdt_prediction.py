@@ -1,6 +1,10 @@
-import lightgbm as lgb
-import pandas as pd
-from sklearn.metrics import mean_squared_error
+import os, sys, inspect
+# this is done to run things from console
+current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parent_dir = os.path.dirname(current_dir)
+parend_dir2 = os.path.dirname(parent_dir)
+sys.path.insert(0, parent_dir2)
+
 import pickle
 from sklearn.model_selection import train_test_split
 import numpy as np
