@@ -76,7 +76,7 @@ params['max_depth'] = 9
 params['min_data_in_leaf'] = 9
 for i in range(2, 9):
     params['bagging_fraction'] = 0.1*i
-cross_validation_gbdt(data, params, activations=True, cval_range=5)
+    cross_validation_gbdt(data, params, activations=True, cval_range=5)
 
 # for i in range(3, 18, 2):
 #     params['min_data_in_leaf'] = i
