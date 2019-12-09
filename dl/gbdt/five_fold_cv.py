@@ -38,8 +38,9 @@ def get_xy(data, activations, exclude):
     return x, y, train_test_split, x_names
 
 
-def save_results(res, activations, exclude=''):
+def save_results(res, activations, exclude='', extra_folder=''):
     global out_path
+    output_path = os.path.join(out_path, extra_folder)
     if activations:
         acs = 'w_acs_'
     else:
@@ -49,7 +50,7 @@ def save_results(res, activations, exclude=''):
     else:
         excluded = ''
     folder_name = f'{int(time.time())}_{acs}_{str(np.mean(res["rmse"])).replace(".", "_")}{excluded}'
-    out_dir = os.path.join(out_path, folder_name)
+    out_dir = os.path.join(output_path, folder_name)
     os.makedirs(out_dir, exist_ok=True)
     res_csv = {'RMSE': res['rmse'], 'RMSE_Y_MEAN': res['rmse_mean'], 'RMSE_TRAIN': res['rmse_train'],
                'RMSE_Y_MEAN_TRAIN': res['rmse_mean_train']}
@@ -68,7 +69,7 @@ def save_results(res, activations, exclude=''):
     print('nice')
 
 
-def cross_validation_gbdt(data, params, activations=False, cval_range=5, exclude=''):
+def cross_validation_gbdt(data, params, activations=False, cval_range=5, exclude='', extra_folder=''):
     params['verbose'] = -1
     x, y, train_test_split, x_names = get_xy(data, activations, exclude=exclude)
     print(x_names)
@@ -114,7 +115,10 @@ def cross_validation_gbdt(data, params, activations=False, cval_range=5, exclude
     res['x'] = x
     res['y'] = y
     res['train_test_split'] = train_test_split
-    save_results(res, activations, exclude=exclude)
+    save_results(res, activations, exclude=exclude, extra_folder=extra_folder)
     return res
 
-out_path = r'C:\Users\Fabian\stanford\gbdt'
+if os.name == 'nt':
+    out_path = r'C:\Users\Fabian\stanford\gbdt'
+elif os.name == 'posix':
+    out_path = r'/share/wandell/data/reith/gbdt'
