@@ -75,6 +75,7 @@ def save_results(res, activations, exclude='', extra_folder=''):
 
 def cross_validation_gbdt(data, params, activations=False, cval_range=5, exclude='', extra_folder=''):
     params['verbose'] = -1
+    print(params)
     x, y, train_test_split, x_names = get_xy(data, activations, exclude=exclude)
     print(x_names)
     res = {'predictions': [], 'labels': [], 'rmse': [], 'pred_train': [], 'labels_train': [],
