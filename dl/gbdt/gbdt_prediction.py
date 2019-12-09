@@ -64,13 +64,19 @@ params = {
 params['learning_rate'] = 0.0045
 params['num_iterations'] = 4000
 params['min_data_in_leaf'] = 9
-params['max_depth'] = 26 # 9 also quite good
-cross_validation_gbdt(data, params, activations=True, cval_range=5)
+params['max_depth'] = 9 # 9 also quite good
+# cross_validation_gbdt(data, params, activations=True, cval_range=5)
 sub_processes = []
+for i in range(3, 21, 3):
+    params['max_depth'] = i
+    print(params)
+    cross_validation_gbdt(data, params, activations=True, cval_range=5, extra_folder='depth_search')
+
+params['max_depth'] = 9
 for i in range(3, 18, 2):
     params['min_data_in_leaf'] = i
     print(params)
-    cross_validation_gbdt(data, params, activations=True, cval_range=1, extra_folder='leaf_search')
+    cross_validation_gbdt(data, params, activations=True, cval_range=5, extra_folder='leaf_search')
     # spreading out into different processes does not seem to speed up GBDT prediction
     # params['learning_rate'] = i*0.0045
     # sub_proc = mp.Process(target=cross_validation_gbdt, args=[data, params], kwargs={'activations': True,
