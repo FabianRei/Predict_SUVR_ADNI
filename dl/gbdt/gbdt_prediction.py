@@ -10,6 +10,8 @@ from sklearn.model_selection import train_test_split
 import numpy as np
 from matplotlib import pyplot as plt
 from dl.gbdt.five_fold_cv import cross_validation_gbdt
+import multiprocessing as mp
+
 
 # in_path = r'C:\Users\Fabian\stanford\fed_learning\rsync\fl\rf_data_train_test.pickle'
 if os.name == 'nt':
@@ -63,11 +65,26 @@ params['learning_rate'] = 0.0045
 params['num_iterations'] = 4000
 params['min_data_in_leaf'] = 9
 params['max_depth'] = 11
-cross_validation_gbdt(data, params, activations=True, cval_range=5)
-# for i in range(4, 14):
-#     params['max_depth'] = i
-#     cross_validation_gbdt(data, params, activations=True, cval_range=1)
-#
+# cross_validation_gbdt(data, params, activations=True, cval_range=5)
+sub_processes = []
+for i in range(1, 24):
+    params['num_iterations'] = i*0.0005
+    sub_proc = mp.Process(target=cross_validation_gbdt, args=[data, params], kwargs={'activations': True,
+                                                                                     'cval_range': 5,
+                                                                                     'extra_folder': 'lr_search'})
+
+    sub_proc.start()
+    sub_processes.append(sub_proc)
+    if len(sub_processes)<10:
+        continue
+    while len(sub_processes) >= 10:
+        for j, sub in enumerate(sub_processes):
+            if not sub.is_alive():
+                sub_processes.pop(j)
+                break
+
+#cross_validation_gbdt(data, params, activations=True, cval_range=5, extra_folder='lr_search')
+
 # params['max_depth'] = 11
 #
 # for i in range(6, 21, 3):
