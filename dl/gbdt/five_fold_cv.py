@@ -67,6 +67,9 @@ def save_results(res, activations, exclude='', extra_folder=''):
         pprint.pprint(res['params'], f)
     with open(os.path.join(out_dir, 'all_results.pickle'), 'wb') as f:
         pickle.dump(res, f)
+    res['x'] = None
+    with open(os.path.join(out_dir, 'some_results.p'), 'wb') as f:
+        pickle.dump(res, f)
     print('nice')
 
 
