@@ -35,7 +35,7 @@ params = {
     'bagging_fraction': 0.5,
     'bagging_freq': 1,
     'verbose': 0,
-    'min_data_in_leaf': 23  # 23 for metadata, 9 for activations
+    'min_data_in_leaf': 9  # 23 for metadata, 9 for activations
 }
 # for i in range(3, 12):
 #     params['max_depth'] = i
@@ -73,7 +73,7 @@ params['max_depth'] = 11 # 11 also quite good
 #     cross_validation_gbdt(data, params, activations=True, cval_range=5, extra_folder='depth_search_cv')
 
 params['max_depth'] = 9
-params['min_data_in_leaf'] = 13
+params['min_data_in_leaf'] = 9
 cross_validation_gbdt(data, params, activations=True, cval_range=5)
 
 # for i in range(3, 18, 2):
