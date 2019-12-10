@@ -60,7 +60,7 @@ params['num_iterations'] = 4000
 #
 for i in range(1,10):
     params['max_bin'] = i*10+200
-    cross_validation_gbdt(data, params, activations=False, cval_range=5)
+    cross_validation_gbdt(data, params, activations=True, cval_range=5)
 
 features = ['t0_suvr', 'sex', 'weight', 'delta_time', 'apoe', 'mmsescore', 'faqtotal', 'age']
 # cross_validation_gbdt(data, params, activations=False, cval_range=5)
