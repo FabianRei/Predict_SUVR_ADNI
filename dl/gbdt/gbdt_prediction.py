@@ -58,9 +58,9 @@ params['learning_rate'] = 0.0045
 params['num_iterations'] = 4000
 # cross_validation_gbdt(data, params, activations=True, cval_range=5, exclude='sex')
 #
-for i in range(1,10):
-    params['feature_fraction'] = i*0.05+0.25
-    cross_validation_gbdt(data, params, activations=True, cval_range=5)
+for i in range(11):
+    params['max_bin'] = 200+i*10
+    cross_validation_gbdt(data, params, activations=True, cval_range=5, extra_folder='max_bin')
 
 features = ['t0_suvr', 'sex', 'weight', 'delta_time', 'apoe', 'mmsescore', 'faqtotal', 'age']
 # cross_validation_gbdt(data, params, activations=False, cval_range=5)
