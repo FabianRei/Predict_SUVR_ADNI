@@ -29,8 +29,8 @@ params = {
     'max_leaves': 50,
     'max_depth': 9,  # 9 optimal for activations, 4 optimal for metadata only
     'max_bin': 255,
-    'num_iterations': 8000,
-    'learning_rate': 0.00215,  # 0.0007 optimal for metadata, 0.0045 for activations
+    'num_iterations': 4000,
+    'learning_rate': 0.0045,  # 0.0007 optimal for metadata, 0.0045 for activations
     'feature_fraction': 0.8,
     'bagging_fraction': 0.5,
     'bagging_freq': 1,
