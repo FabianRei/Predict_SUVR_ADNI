@@ -31,7 +31,7 @@ params = {
     'max_bin': 255,
     'num_iterations': 4000,
     'learning_rate': 0.0045,  # 0.0007 optimal for metadata, 0.0045 for activations
-    'feature_fraction': 0.8,
+    'feature_fraction': 0.5,
     'bagging_fraction': 0.5,
     'bagging_freq': 1,
     'verbose': 0,
@@ -56,11 +56,11 @@ params = {
 # print('done')
 params['learning_rate'] = 0.0045
 params['num_iterations'] = 4000
-# cross_validation_gbdt(data, params, activations=True, cval_range=5, exclude='sex')
+# cross_validation_gbdt(data, params, activations=False, cval_range=5, exclude='sex')
 #
-for i in range(11):
-    params['max_bin'] = 200+i*10
-    cross_validation_gbdt(data, params, activations=True, cval_range=5, extra_folder='max_bin')
+for i in range(1,10):
+    params['max_bin'] = i*10+200
+    cross_validation_gbdt(data, params, activations=False, cval_range=5)
 
 features = ['t0_suvr', 'sex', 'weight', 'delta_time', 'apoe', 'mmsescore', 'faqtotal', 'age']
 # cross_validation_gbdt(data, params, activations=False, cval_range=5)
