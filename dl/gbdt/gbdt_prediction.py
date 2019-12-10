@@ -54,16 +54,16 @@ params = {
 #     cross_validation_gbdt(data, params, activations=False, cval_range=5)
 #
 # print('done')
-params['learning_rate'] = 0.0040
+params['learning_rate'] = 0.0045
 params['num_iterations'] = 4000
-cross_validation_gbdt(data, params, activations=True, cval_range=5)
+cross_validation_gbdt(data, params, activations=True, cval_range=5, exclude='sex')
 #
-for i in range(9):
-    params['learning_rate'] += 0.0001
-    cross_validation_gbdt(data, params, activations=True, cval_range=5)
-
-features = ['t0_suvr', 'sex', 'weight', 'delta_time', 'apoe', 'mmsescore', 'faqtotal', 'age']
-cross_validation_gbdt(data, params, activations=False, cval_range=5)
+# for i in range(9):
+#     params['learning_rate'] += 0.0001
+#     cross_validation_gbdt(data, params, activations=True, cval_range=5)
+#
+# features = ['t0_suvr', 'sex', 'weight', 'delta_time', 'apoe', 'mmsescore', 'faqtotal', 'age']
+# cross_validation_gbdt(data, params, activations=False, cval_range=5)
 
 # new params: 0.009 lr, its 2000, max_depth 9, min_data_in_leaf 9
 params['learning_rate'] = 0.0045
