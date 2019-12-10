@@ -30,8 +30,8 @@ params = {
     'max_depth': 9,  # 9 optimal for activations, 4 optimal for metadata only
     'max_bin': 255,
     'num_iterations': 10000,
-    'learning_rate': 0.0005,  # 0.0007 optimal for metadata, 0.0045 for activations
-    'feature_fraction': 0.8,
+    'learning_rate': 0.0008,  # 0.0007 optimal for metadata, 0.0045 for activations
+    'feature_fraction': 0.6,
     'bagging_fraction': 0.5,
     'bagging_freq': 1,
     'verbose': 0,
@@ -56,7 +56,7 @@ params = {
 # print('done')
 
 for i in range(10):
-    params['learning_rate'] += 0.0005
+    params['learning_rate'] += 0.0001
     cross_validation_gbdt(data, params, activations=True, cval_range=5)
 
 # features = ['t0_suvr', 'sex', 'weight', 'delta_time', 'apoe', 'mmsescore', 'faqtotal', 'age']
