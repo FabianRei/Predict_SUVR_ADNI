@@ -54,12 +54,12 @@ params = {
 #     cross_validation_gbdt(data, params, activations=False, cval_range=5)
 #
 # print('done')
-params['learning_rate'] = 0.003
+params['learning_rate'] = 0.0041
 params['num_iterations'] = 4000
 cross_validation_gbdt(data, params, activations=True, cval_range=5)
 #
 for i in range(10):
-    params['learning_rate'] += 0.0005
+    params['learning_rate'] += 0.0001
     cross_validation_gbdt(data, params, activations=True, cval_range=5)
 
 features = ['t0_suvr', 'sex', 'weight', 'delta_time', 'apoe', 'mmsescore', 'faqtotal', 'age']
