@@ -27,7 +27,7 @@ params = {
     'objective': 'regression',
     'metric': 'mse',
     'max_leaves': 50,
-    'max_depth': 9,  # 9 optimal for activations, 4 optimal for metadata only
+    'max_depth': 11,  # 9 optimal for activations, 4 optimal for metadata only
     'max_bin': 255,
     'num_iterations': 4000,
     'learning_rate': 0.0045,  # 0.0007 optimal for metadata, 0.0045 for activations
