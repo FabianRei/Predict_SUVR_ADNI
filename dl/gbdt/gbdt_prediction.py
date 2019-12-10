@@ -27,10 +27,10 @@ params = {
     'objective': 'regression',
     'metric': 'mse',
     'max_leaves': 50,
-    'max_depth': 4,  # 11 optimal for activations, 4 optimal for metadata only
+    'max_depth': 9,  # 9 optimal for activations, 4 optimal for metadata only
     'max_bin': 255,
-    'num_iterations': 4000,
-    'learning_rate': 0.0007,  # 0.0007 optimal for metadata, 0.002 for activations
+    'num_iterations': 8000,
+    'learning_rate': 0.00215,  # 0.0007 optimal for metadata, 0.0045 for activations
     'feature_fraction': 0.8,
     'bagging_fraction': 0.5,
     'bagging_freq': 1,
@@ -55,7 +55,7 @@ params = {
 #
 # print('done')
 
-# cross_validation_gbdt(data, params, activations=False, cval_range=5)
+cross_validation_gbdt(data, params, activations=False, cval_range=5)
 
 # features = ['t0_suvr', 'sex', 'weight', 'delta_time', 'apoe', 'mmsescore', 'faqtotal', 'age']
 # cross_validation_gbdt(data, params, activations=False, cval_range=5)
@@ -72,33 +72,33 @@ params['max_depth'] = 11 # 11 also quite good
 #     print(params)
 #     cross_validation_gbdt(data, params, activations=True, cval_range=5, extra_folder='depth_search_cv')
 
-params['max_depth'] = 9
-params['min_data_in_leaf'] = 9
-# params['boosting_type'] = 'dart'
-for i in range(2, 45, 2):
-    params['learning_rate'] = 0.0001*i
-    cross_validation_gbdt(data, params, activations=True, cval_range=5, extra_folder='lr_9_9')
-
-params['max_depth'] = 11
-params['min_data_in_leaf'] = 9
-# params['boosting_type'] = 'dart'
-for i in range(5, 66, 5):
-    params['learning_rate'] = 0.0001*i
-    cross_validation_gbdt(data, params, activations=True, cval_range=5, extra_folder='lr_11_9')
-
-params['max_depth'] = 11
-params['min_data_in_leaf'] = 13
-# params['boosting_type'] = 'dart'
-for i in range(5, 66, 5):
-    params['learning_rate'] = 0.0001*i
-    cross_validation_gbdt(data, params, activations=True, cval_range=5, extra_folder='lr_11_13')
-
-params['max_depth'] = 9
-params['min_data_in_leaf'] = 13
-# params['boosting_type'] = 'dart'
-for i in range(2, 60, 2):
-    params['learning_rate'] = 0.0001*i
-    cross_validation_gbdt(data, params, activations=True, cval_range=5, extra_folder='lr_9_13')
+# params['max_depth'] = 9
+# params['min_data_in_leaf'] = 9
+# # params['boosting_type'] = 'dart'
+# for i in range(2, 45, 2):
+#     params['learning_rate'] = 0.0001*i
+#     cross_validation_gbdt(data, params, activations=True, cval_range=5, extra_folder='lr_9_9')
+#
+# params['max_depth'] = 11
+# params['min_data_in_leaf'] = 9
+# # params['boosting_type'] = 'dart'
+# for i in range(5, 66, 5):
+#     params['learning_rate'] = 0.0001*i
+#     cross_validation_gbdt(data, params, activations=True, cval_range=5, extra_folder='lr_11_9')
+#
+# params['max_depth'] = 11
+# params['min_data_in_leaf'] = 13
+# # params['boosting_type'] = 'dart'
+# for i in range(5, 66, 5):
+#     params['learning_rate'] = 0.0001*i
+#     cross_validation_gbdt(data, params, activations=True, cval_range=5, extra_folder='lr_11_13')
+#
+# params['max_depth'] = 9
+# params['min_data_in_leaf'] = 13
+# # params['boosting_type'] = 'dart'
+# for i in range(2, 60, 2):
+#     params['learning_rate'] = 0.0001*i
+#     cross_validation_gbdt(data, params, activations=True, cval_range=5, extra_folder='lr_9_13')
 
 # for i in range(3, 18, 2):
 #     params['min_data_in_leaf'] = i
