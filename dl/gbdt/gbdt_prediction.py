@@ -55,7 +55,7 @@ params = {
 #
 # print('done')
 
-cross_validation_gbdt(data, params, activations=False, cval_range=5)
+cross_validation_gbdt(data, params, activations=True, cval_range=5)
 
 # features = ['t0_suvr', 'sex', 'weight', 'delta_time', 'apoe', 'mmsescore', 'faqtotal', 'age']
 # cross_validation_gbdt(data, params, activations=False, cval_range=5)
