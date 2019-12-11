@@ -54,14 +54,14 @@ params = {
 #     cross_validation_gbdt(data, params, activations=False, cval_range=5)
 #
 # print('done')
-params['learning_rate'] = 0.0006
+params['learning_rate'] = 0.0045
 params['num_iterations'] = 4000
-params['max_depth'] = 4
-params['feature_fraction'] = 0.8
+params['max_depth'] = 9
+params['feature_fraction'] = 0.5
 # cross_validation_gbdt(data, params, activations=False, cval_range=5, exclude='sex')
 #
 
-cross_validation_gbdt(data, params, activations=False, cval_range=5, extra_folder='lr_no_acs_2')
+cross_validation_gbdt(data, params, activations=True, cval_range=5)
 
 features = ['t0_suvr', 'sex', 'weight', 'delta_time', 'apoe', 'mmsescore', 'faqtotal', 'age']
 # cross_validation_gbdt(data, params, activations=False, cval_range=5)
