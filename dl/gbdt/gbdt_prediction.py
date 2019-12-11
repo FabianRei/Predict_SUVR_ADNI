@@ -56,8 +56,8 @@ params = {
 # print('done')
 params['learning_rate'] = 0.0045
 params['num_iterations'] = 4000
-params['min_data_in_leaf'] = 23
-params['max_depth'] = 4
+params['min_data_in_leaf'] = 9
+params['max_depth'] = 9
 params['feature_fraction'] = 0.8
 # cross_validation_gbdt(data, params, activations=False, cval_range=5, exclude='sex')
 #
