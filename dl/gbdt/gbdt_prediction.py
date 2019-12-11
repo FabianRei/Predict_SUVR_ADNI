@@ -61,9 +61,11 @@ params['max_depth'] = 4
 params['feature_fraction'] = 0.8
 # cross_validation_gbdt(data, params, activations=False, cval_range=5, exclude='sex')
 #
-for i in range(1, 4):
-    params['learning_rate'] = i*0.0001+0.0005
-    cross_validation_gbdt(data, params, activations=False, cval_range=5, extra_folder='lr_no_acs')
+for j in range(1, 11):
+    params['max_depth'] = j
+    for i in range(1, 4):
+        params['learning_rate'] = i*0.0001+0.0005
+        cross_validation_gbdt(data, params, activations=False, cval_range=5, extra_folder='lr_no_acs')
 
 features = ['t0_suvr', 'sex', 'weight', 'delta_time', 'apoe', 'mmsescore', 'faqtotal', 'age']
 # cross_validation_gbdt(data, params, activations=False, cval_range=5)
