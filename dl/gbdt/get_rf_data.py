@@ -97,9 +97,9 @@ for a1, a2 in zip(apoea1, apoea2):
         apoe.append(0)
     elif a1 == 2 and a2 == 3:
         apoe.append(1)
-    elif a1 == 2 and a2 == 4:
-        apoe.append(2)
     elif a1 == 3 and a2 == 3:
+        apoe.append(2)
+    elif a1 == 2 and a2 == 4:
         apoe.append(3)
     elif a1 == 3 and a2 == 4:
         apoe.append(4)
