@@ -31,11 +31,11 @@ params = {
     'max_bin': 255,
     'num_iterations': 4000,
     'learning_rate': 0.0045,  # 0.0007 optimal for metadata, 0.0045 for activations
-    'feature_fraction': 0.5,
+    'feature_fraction': 0.5, # 0.8 for metadata only
     'bagging_fraction': 0.5,
     'bagging_freq': 1,
     'verbose': 0,
-    'min_data_in_leaf': 9  # 23 for metadata, 9 for activations
+    'min_data_in_leaf': 9
 }
 # for i in range(3, 12):
 #     params['max_depth'] = i
@@ -63,9 +63,9 @@ params['feature_fraction'] = 0.8
 #
 for j in range(1, 11):
     params['max_depth'] = j
-    for i in range(1, 4):
-        params['learning_rate'] = i*0.0001+0.0005
-        cross_validation_gbdt(data, params, activations=False, cval_range=5, extra_folder='lr_no_acs')
+    for i in range(1, 12):
+        params['learning_rate'] = i*0.00005+0.0004
+        cross_validation_gbdt(data, params, activations=False, cval_range=5, extra_folder='lr_no_acs_2')
 
 features = ['t0_suvr', 'sex', 'weight', 'delta_time', 'apoe', 'mmsescore', 'faqtotal', 'age']
 # cross_validation_gbdt(data, params, activations=False, cval_range=5)
