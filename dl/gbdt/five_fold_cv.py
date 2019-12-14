@@ -31,10 +31,15 @@ def get_xy(data, activations, exclude):
         #     x.append(v)
 
     # add activations:
+    idx = x_names.index('sex')
+    x[idx] = x[idx].astype(np.int)
+    idx = x_names.index('apoe')
+    x[idx] = x[idx]
     if activations:
         x.extend(list(data['activations'].T))
     x = np.array(x).T
     train_test_split = data['test']
+    # x = pd.DataFrame(x)
     return x, y, train_test_split, x_names
 
 
@@ -80,6 +85,7 @@ def cross_validation_gbdt(data, params, activations=False, cval_range=5, exclude
     print(x_names)
     res = {'predictions': [], 'labels': [], 'rmse': [], 'pred_train': [], 'labels_train': [],
            'rmse_train': [], 'rmse_mean': [], 'rmse_mean_train': [], 'gbm': []}
+    params['categorical_feature'] = [1, 4, 5, 6]
     for split in range(cval_range):
         test = train_test_split == split
         # use train mean val for not known faqtotal and mmse

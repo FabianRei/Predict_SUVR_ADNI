@@ -54,25 +54,32 @@ params = {
 #     cross_validation_gbdt(data, params, activations=False, cval_range=5)
 #
 # print('done')
-params['learning_rate'] = 0.0045
-params['num_iterations'] = 4000
-params['max_depth'] = 9
-params['feature_fraction'] = 0.5
+with_activations = True
+
+if with_activations:
+    params['learning_rate'] = 0.0006
+    params['num_iterations'] = 4000
+    params['max_depth'] = 4
+    params['feature_fraction'] = 0.8
+else:
+    params['learning_rate'] = 0.0045
+    params['max_depth'] = 9
+    params['feature_fraction'] = 0.5
 # cross_validation_gbdt(data, params, activations=False, cval_range=5, exclude='sex')
 #
 
-cross_validation_gbdt(data, params, activations=True, cval_range=5)
+cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, extra_folder='exclusions_no_acs')
 
 features = ['t0_suvr', 'sex', 'weight', 'delta_time', 'apoe', 'mmsescore', 'faqtotal', 'age']
 for f in features:
-    cross_validation_gbdt(data, params, activations=True, cval_range=5, exclude=f, extra_folder='exclusions')
-# cross_validation_gbdt(data, params, activations=False, cval_range=5)
+    cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, exclude=f, extra_folder='exclusions_no_acs')
+# # cross_validation_gbdt(data, params, activations=False, cval_range=5)
 
 # new params: 0.009 lr, its 2000, max_depth 9, min_data_in_leaf 9
-params['learning_rate'] = 0.0045
+params['learning_rate'] = 0.0006
 params['num_iterations'] = 4000
 params['min_data_in_leaf'] = 9
-params['max_depth'] = 11 # 11 also quite good
+params['max_depth'] = 4 # 11 also quite good
 # cross_validation_gbdt(data, params, activations=True, cval_range=5)
 # sub_processes = []
 # for i in range(3, 21, 3):
