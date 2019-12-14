@@ -30,11 +30,11 @@ def get_xy(data, activations, exclude):
         # elif k == 't0_suvr':
         #     x.append(v)
 
+    # idx = x_names.index('sex')
+    # x[idx] = x[idx].astype(np.int)
+    # idx = x_names.index('apoe')
+    # x[idx] = x[idx]
     # add activations:
-    idx = x_names.index('sex')
-    x[idx] = x[idx].astype(np.int)
-    idx = x_names.index('apoe')
-    x[idx] = x[idx]
     if activations:
         x.extend(list(data['activations'].T))
     x = np.array(x).T
