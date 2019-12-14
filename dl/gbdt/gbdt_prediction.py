@@ -56,7 +56,7 @@ params = {
 # print('done')
 with_activations = False
 
-if with_activations:
+if not with_activations:
     params['learning_rate'] = 0.0006
     params['num_iterations'] = 4000
     params['max_depth'] = 4
