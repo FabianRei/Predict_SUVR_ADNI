@@ -54,7 +54,7 @@ params = {
 #     cross_validation_gbdt(data, params, activations=False, cval_range=5)
 #
 # print('done')
-with_activations = True
+with_activations = False
 
 if with_activations:
     params['learning_rate'] = 0.0006
