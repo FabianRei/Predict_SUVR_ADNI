@@ -58,7 +58,6 @@ with_activations = False
 
 if not with_activations:
     params['learning_rate'] = 0.0006
-    params['num_iterations'] = 4000
     params['max_depth'] = 4
     params['feature_fraction'] = 0.8
 else:
