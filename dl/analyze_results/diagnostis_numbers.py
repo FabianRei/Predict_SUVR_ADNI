@@ -246,6 +246,7 @@ def create_diagnosis_data():
     exam_dates = np.copy(delta_time)
     diagnoses = np.copy(delta_time)
     differences = np.copy(delta_time)
+    t0_diagnoses = np.copy(delta_time)
     ex_date = diagnosis_data['EXAMDATE']
     # name not found dates via -1
     ex_data = []
@@ -269,6 +270,7 @@ def create_diagnosis_data():
 
     # search for diagnosis
     found = []
+    found_t0 = []
     for s in np.unique(subs):
         # delta time is to order correctly. Needed to put exam_data on the correct spot.
         ex = get_examdate(s, delta_time)
@@ -282,13 +284,20 @@ def create_diagnosis_data():
             found.append(-1)
         else:
             found.append(1)
+        if digs[ex.argmin()] == -1:
+            found_t0.append(0)
+        else:
+            found_t0.append(1)
         exam_dates[subs==s] = ex
         diagnoses[subs==s] = digs
         differences[subs==s] = diffs
+        t0_diagnoses[subs==s] = digs[ex.argmin()]
     found = np.array(found)
+    found_t0 = np.array(found_t0)
     output_folder = r'C:\Users\Fabian\stanford'
     results = {'diagnoses': diagnoses, 'differences': differences, 'subs': subs, 'suvr': suvr,
-               't0_suvr': t0_suvr, 'exam_dates': exam_dates, 'delta_time': delta_time, 'delta_suvr': delta_suvr}
+               't0_suvr': t0_suvr, 'exam_dates': exam_dates, 'delta_time': delta_time, 'delta_suvr': delta_suvr, 'found_subject': found,
+               't0_diagnoses': t0_diagnoses, 'found_t0': found_t0}
     with open(os.path.join(output_folder, 'diagnoses_DXSUM.pickle'), 'wb') as f:
         pickle.dump(results, f)
     print('nice')

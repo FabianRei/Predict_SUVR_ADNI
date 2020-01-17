@@ -50,6 +50,7 @@ def get_unique_t0_suvr():
     suvr_unique = t0_suvr[t0_idx]
     return suvr_unique
 
+
 def get_matches(number):
     global preds
     global labs
@@ -68,7 +69,8 @@ def get_matches(number):
     return (labs > perc_lab) & (preds > perc_pred)
 
 
-def get_matches_target(study_size, target_size):
+def get_matches_target(study_size, target_size, detailled=False):
+    # returns filter label, filter pred & filter combinded
     global preds
     global labs
     global subs
@@ -83,8 +85,10 @@ def get_matches_target(study_size, target_size):
     print(f"{len(sub_ids_study)} in study, {len(np.unique(sub_ids))} also in top {len(sub_ids_label)} of labels.")
     # print(result)
     # print(len(np.unique(sub_ids)), sub_ids)
-    return (labs > perc_lab) & (preds > perc_pred)
-
+    if detailled:
+        return (labs>perc_lab), (preds>perc_pred), (labs > perc_lab) & (preds > perc_pred)
+    else:
+        return(labs > perc_lab) & (preds > perc_pred)
 
 def get_high_t0suvr_matches(number):
     global preds
@@ -102,6 +106,7 @@ def get_high_t0suvr_matches(number):
     # print(result)
     # print(len(np.unique(sub_ids)), sub_ids)
     return (labs > perc_lab) & (t0_suvr > high_suvr)
+
 
 def get_minimal_change_matches(number):
     global preds
@@ -146,6 +151,34 @@ def rmse_over_time():
     return 0
 
 
+def to_ampos_subjects(filter=None):
+    global preds
+    global labs
+    global t0_suvr
+    global subs
+    if filter is not None:
+        p = preds[filter]
+        l = labs[filter]
+        t0 = t0_suvr[filter]
+        s = subs[filter]
+    else:
+        # copy, as otherwise might mess up global
+        p = np.copy(preds)
+        l = np.copy(labs)
+        t0 = np.copy(t0_suvr)
+        s = np.copy(subs)
+    s_res = []
+    suvr = t0+l
+    pred_suvr = t0+p
+    for su in np.unique(s):
+        s_filt = su==s
+        suvr_f = suvr[s_filt]
+        pred_suvr_f = pred_suvr[s_filt]
+        t0_f = t0[s_filt]
+        if suvr_f.max()>0.79:
+            s_res.append(s)
+    print(f'out of {len(np.unique(s))} amyloid negative subjects, we find that {len(s_res)} turn to amyloid positive')
+    return np.array(s_res)
 
 target_folder = r'C:\Users\Fabian\stanford\gbdt\analysis'
 target_file = 'all_results.pickle'
@@ -200,6 +233,24 @@ print(np.sum((labs>perc2) & (preds>perc)))
 filter = get_matches(100)
 _, sub_filter = np.unique(subs, return_index=True)
 rmse_over_time()
+
+
+
+# filter to amyloid -
+amneg_filter = t0_suvr<0.79
+labs = labs[amneg_filter]
+preds = preds[amneg_filter]
+subs = subs[amneg_filter]
+t0_suvr = t0_suvr[amneg_filter]
+to_ampos_subjects()
+# creating 100 subj study, how many are also top 100 pos change subject?
+filter_lab, filter_pred, filter_comb = get_matches_target(100, 100, True)
+results = to_ampos_subjects(filter_pred)
+results = to_ampos_subjects(filter_lab)
+# 50 subj in study..
+filter_lab, filter_pred, filter_comb = get_matches_target(50, 50, True)
+results = to_ampos_subjects(filter_pred)
+results = to_ampos_subjects(filter_lab)
 for gbm in gbms:
     fis.append(gbm.feature_importance())
 fi = fis[0]
