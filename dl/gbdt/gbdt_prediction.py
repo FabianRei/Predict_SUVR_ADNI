@@ -73,7 +73,7 @@ features = ['t0_suvr', 'sex', 'weight', 'delta_time', 'apoe', 'mmsescore', 'faqt
 for f in features:
     cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, exclude=f, extra_folder='exclusions_w_acs3')
 # cross_validation_gbdt(data, params, activations=False, cval_range=5)
-
+#test
 # # new params: 0.009 lr, its 2000, max_depth 9, min_data_in_leaf 9
 # params['learning_rate'] = 0.0006
 # params['num_iterations'] = 4000
