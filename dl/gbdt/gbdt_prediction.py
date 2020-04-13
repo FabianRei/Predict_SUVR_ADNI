@@ -67,14 +67,14 @@ else:
 # cross_validation_gbdt(data, params, activations=False, cval_range=5, exclude='sex')
 #
 
-for i in range(2, 12):
-    params['max_depth'] = 4
-    cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, extra_folder='depths2')
+# for i in range(2, 12):
+#     params['max_depth'] = 4
+#     cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, extra_folder='depths2')
 
 params['max_depth'] = 4
 
-for i in range(0.0001, 0.006, 0.0001):
-    params['learning_rate'] = i
+for i in range(1, 60):
+    params['learning_rate'] = i/10000
     cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, extra_folder='lr2')
 
 
