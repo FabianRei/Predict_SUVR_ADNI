@@ -68,7 +68,7 @@ else:
 #
 
 for i in range(2, 12):
-    params['max_depths'] = 4
+    params['max_depth'] = 4
     cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, extra_folder='depths2')
 
 params['max_depth'] = 4
