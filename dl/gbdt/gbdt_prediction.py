@@ -54,7 +54,7 @@ params = {
 #     cross_validation_gbdt(data, params, activations=False, cval_range=5)
 #
 # print('done')
-with_activations = True
+with_activations = False
 
 if not with_activations:
     params['learning_rate'] = 0.0006
@@ -67,11 +67,20 @@ else:
 # cross_validation_gbdt(data, params, activations=False, cval_range=5, exclude='sex')
 #
 
-cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, extra_folder='exclusions_wo_acs4')
+for i in range(2, 12):
+    params['max_depths'] = 4
+    cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, extra_folder='depths2')
 
-features = ['t0_suvr', 'sex', 'weight', 'delta_time', 'apoe', 'mmsescore', 'faqtotal', 'age']
-for f in features:
-    cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, exclude=f, extra_folder='exclusions_wo_acs4')
+params['max_depth'] = 4
+
+for i in range(0.0001, 0.006, 0.0001):
+    params['learning_rate'] = i
+    cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, extra_folder='lr2')
+
+
+# features = ['t0_suvr', 'sex', 'weight', 'delta_time', 'apoe', 'mmsescore', 'faqtotal', 'age']
+# for f in features:
+#     cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, exclude=f, extra_folder='exclusions_wo_acs4')
 # cross_validation_gbdt(data, params, activations=False, cval_range=5)
 #test
 # # new params: 0.009 lr, its 2000, max_depth 9, min_data_in_leaf 9
