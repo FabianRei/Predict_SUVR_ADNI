@@ -207,11 +207,19 @@ dia_delta_time = diagnosis_data['delta_time']
 t0_diagnoses = t0_diagnoses[dia_delta_time>0]
 # filter to amyloid -
 amneg_filter = t0_suvr<0.79
-labs = labs[amneg_filter]
-preds = preds[amneg_filter]
-subs = subs[amneg_filter]
-t0_suvr = t0_suvr[amneg_filter]
-t0_diagnoses = t0_diagnoses[amneg_filter]
+# filter to mildly a+
+perc_75 = 0.95665
+mildly_filter = (t0_suvr>0.79) & (t0_suvr <perc_75)
+severe_pos_filter = t0_suvr >= perc_75
+
+# choose filter to apply
+curr_filter = amneg_filter
+# apply filter
+labs = labs[curr_filter]
+preds = preds[curr_filter]
+subs = subs[curr_filter]
+t0_suvr = t0_suvr[curr_filter]
+t0_diagnoses = t0_diagnoses[curr_filter]
 
 # filter for unique subjects:
 _, unique_idxs = np.unique(subs, return_index=True)
@@ -231,7 +239,7 @@ _, unique_idxs = np.unique(subs, return_index=True)
 # to_ampos_subjects()
 
 # creating 100 subj study, how many are also top 100 pos change subject?
-filter_lab, filter_pred, filter_comb = get_matches_target(50, 50, True)
+filter_lab, filter_pred, filter_comb = get_matches_target(25, 25, True)
 visualize_top_changes()
 subjects = to_ampos_subjects(filter_pred)
 subjects = to_ampos_subjects(filter_lab)
