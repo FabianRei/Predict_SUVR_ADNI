@@ -81,11 +81,20 @@ def save_results(res, activations, exclude='', extra_folder=''):
 def cross_validation_gbdt(data, params, activations=False, cval_range=5, exclude='', extra_folder=''):
     params['verbose'] = -1
     print(params)
-    x, y, train_test_split, x_names = get_xy(data, activations, exclude=exclude)
+    x, y, train_test_split, x_names = get_xy(data, activations, exclude='')
+    cat_features = [1, 5, 6]
+
+    if exclude != '':
+        excl_index = x_names.index(exclude)
+        if excl_index in cat_features:
+            cat_features.remove(excl_index)
+        x_names.pop(excl_index)
+        np.delete(x, excl_index, axis=1)
     print(x_names)
     res = {'predictions': [], 'labels': [], 'rmse': [], 'pred_train': [], 'labels_train': [],
            'rmse_train': [], 'rmse_mean': [], 'rmse_mean_train': [], 'gbm': []}
-    # params['categorical_feature'] = [1, 4, 5, 6]
+
+    params['categorical_feature'] = cat_features
     for split in range(cval_range):
         test = train_test_split == split
         # use train mean val for not known faqtotal and mmse
