@@ -50,7 +50,7 @@ def run_jobs(jobs):
 if __name__ == '__main__':
     full_start = time.time()
     # get activations
-    sub_folders = ['/scratch/reith/fl/experiments/feature_activations_fixed']
+    sub_folders = ['/scratch/reith/fl/experiments/feature_acs_more_train_data']
     for sub in sub_folders:
         seed = 10
         jobs = [

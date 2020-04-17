@@ -28,7 +28,11 @@ def mixed_lm_crossval(data, cval_fold=5):
     print(keys)
     rmse_test = []
     rmse_train = []
+    pickle_data = []
+    predictions = []
+    labels = []
     for i in range(cval_fold):
+        pdata = dict()
         test = train_test == i
         if 'faqtotal' in keys:
             data['faqtotal'][data['faqtotal'] == -1] = np.mean(data['faqtotal'][~test][data['faqtotal'][~test] != -1])
@@ -49,8 +53,20 @@ def mixed_lm_crossval(data, cval_fold=5):
         print(rmse(dep_train_pred, dep_train))
         rmse_test.append(rmse(dep_test_pred, dep_test))
         rmse_train.append(rmse(dep_train_pred, dep_train))
-
+        predictions.append(dep_test_pred)
+        labels.append(dep_test)
+        pdata['model'] = model
+        pdata['model_params'] = results.params
+        pdata['y'] = dep_test
+        pdata['x'] = indep_test
+        pdata['y_train'] = dep_train
+        pdata['x_train'] = indep_train
+        pickle_data.append(pdata)
         print('db')
+    patient_analysis_data = {}
+    patient_analysis_data['predictions'] = predictions
+    patient_analysis_data['labels'] = labels
+    patient_analysis_data['train_test_split'] = train_test
     print(f'mean rmse test is {np.mean(rmse_test)}')
     print(f'mean rmse train is {np.mean(rmse_train)}')
     print('db')

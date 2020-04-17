@@ -56,7 +56,7 @@ target_file = 'all_results.pickle'
 folders = glob(os.path.join(target_folder, '157*'))
 
 
-folder = folders[-2]
+folder = folders[-1]
 target = os.path.join(folder, target_file)
 with open(target, 'rb') as f:
     data = pickle.load(f)

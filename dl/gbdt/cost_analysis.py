@@ -71,6 +71,10 @@ def get_matches_target(study_size, target_size, detailled=False):
         return(labs > perc_lab) & (preds > perc_pred)
 
 
+def ch(num, changes_pred, changes):
+    print('pred:', sum(changes_pred>num)/len(changes_pred))
+    print('all:', sum(changes>num)/len(changes))
+
 def plot_densities():
     global preds
     global labs
@@ -110,7 +114,7 @@ def to_ampos_subjects(filter=None):
     return np.array(s_res)
 
 
-def get_unique_changes(changes, subjects, subjects2=None, t0_suvr=None):
+def get_unique_changes(changes, subjects, subjects2=None, t0_suvr=None, selector='max', delta_time=None, apoe=None):
     # gets max changes for each subject
     if subjects2 is None:
         subjects2 = subjects
@@ -119,13 +123,26 @@ def get_unique_changes(changes, subjects, subjects2=None, t0_suvr=None):
     # include unique t0_suvr results
     if t0_suvr is not None:
         t0_results = []
+    else:
+        t0_results = None
+    if apoe is not None:
+        apoe_results = []
+    else:
+        apoe_results = None
     for s in np.unique(subjects):
         if not s in subjects2:
             continue
         filt = s==subjects
-        change = changes[filt].max()
+        if selector == 'max':
+            # get maximum change
+            change = changes[filt].max()
+        if selector == 'last':
+            delta = delta_time[filt]
+            change = changes[filt][delta.argmax()]
         if t0_suvr is not None:
             t0_results.append(t0_suvr[filt].max())
+        if apoe is not None:
+            apoe_results.append(apoe[filt][0])
         result.append(change)
         # create corresponding filter for maxval only
         filt_vals = filt[filt==True]
@@ -133,9 +150,10 @@ def get_unique_changes(changes, subjects, subjects2=None, t0_suvr=None):
         filt_vals[changes[filt].argmax()] = True
         filt[filt == True] = filt_vals
         filt_idxs += filt
-    if t0_suvr is not None:
-        return np.array(result), filt_idxs, np.array(t0_results)
-    return np.array(result), filt_idxs
+    result = np.array(result)
+    results = [result, filt_idxs, t0_results, apoe_results]
+    results = [np.array(res) for res in results if res is not None]
+    return results
 
 
 def visualize_top_changes():
@@ -146,17 +164,21 @@ def visualize_top_changes():
     global preds
     global labs
     global t0_suvr
+    global delta_time
+    global apoe
     changes_lab, filter_idxs_lab, t0_suvr_lab = get_unique_changes(labs[filter_lab], subs[filter_lab], t0_suvr=t0_suvr[filter_lab])
-    changes_pred, filter_idxs_pred, t0_suvr_pred = get_unique_changes(labs[filter_pred], subs[filter_pred], t0_suvr=t0_suvr[filter_pred])
+    changes_pred, filter_idxs_pred, t0_suvr_pred, apoe_pred = get_unique_changes(labs[filter_pred], subs[filter_pred], t0_suvr=t0_suvr[filter_pred], delta_time=delta_time[filter_pred], selector='last', apoe=apoe[filter_pred])
     changes_comb, filter_idxs_comb = get_unique_changes(labs[filter_lab], subs[filter_lab], subs[filter_comb])
-    changes, filter_idxs, t0_suvr_ind = get_unique_changes(labs, subs, t0_suvr=t0_suvr)
+    changes, filter_idxs, t0_suvr_ind, apoe_all = get_unique_changes(labs, subs, t0_suvr=t0_suvr, delta_time=delta_time, selector='last', apoe=apoe)
     # filter out top changes that are also predicted
-    flt = np.copy(filter_lab)
+    # chose filter to apply
+    appl_filter = filter_lab
+    flt = np.copy(appl_filter)
     flt[flt==True] = filter_idxs_lab
     flt2 = np.copy(filter_lab)
     flt2[flt2==True] = filter_idxs_comb
     colors = sns.color_palette()
-    plt.hist((labs[flt2], labs[flt & ~flt2]), stacked=True, color=[colors[0], colors[1]], alpha=0.66,
+    plt.hist(labs[flt], color=colors[0], alpha=0.66,
              label=['Subject in study via top 100 amyloid negative GBDT predictions','Max changes of top 100 amyloid negative subjects'])
     sns.distplot((labs[flt2], labs[flt & ~flt2]), stacked=True)
     plt.xlabel('Delta SUVR')
@@ -166,20 +188,14 @@ def visualize_top_changes():
     print('db')
 
 # results file (pickle) with predictions
-gbdt_results = r'C:\Users\Fabian\stanford\gbdt\rsync\.special\1576022195_w_acs__0_03478181179857318\all_results.pickle'
-lin_reg_results = r'C:\Users\Fabian\stanford\gbdt\rsync\.special\linear_regression\all_results.pickle'
-gbdt_no_acs_results = r'C:\Users\Fabian\stanford\gbdt\rsync\.special\1576073951_wo_acs__0_0354701097223875\all_results.pickle'
-
-################################################################
-################################################################
-selected_results = gbdt_no_acs_results
+gbdt_results = 'C:\\Users\\Fabian\\stanford\\gbdt\\analysis\\1576074362_w_acs__0_03483757920168396\\all_results.pickle'
 # file with additional metadata
 additional_data = r'C:\Users\Fabian\stanford\fed_learning\rsync\fl\rf_data_train_test_crossval.pickle'
 # path_detailled_data = r'C:\Users\Fabian\stanford\fed_learning\federated_learning_data\test_meta_data_complete.pickle'
 # diagnostic data:
 path_diagnosis_data = 'C:\\Users\\Fabian\\stanford\\diagnoses_DXSUM.pickle'
 # load data
-with open(selected_results, 'rb') as f:
+with open(gbdt_results, 'rb') as f:
     data = pickle.load(f)
 with open(additional_data, 'rb') as f:
     more_data = pickle.load(f)
@@ -189,11 +205,11 @@ with open(path_diagnosis_data, 'rb') as f:
 # with open(path_detailled_data, 'rb') as f:
 #     detailled_data = pickle.load(f)
 
-# gbms = data['gbm']
-# x_names = data['x_names']
+gbms = data['gbm']
+x_names = data['x_names']
 preds = data['predictions']
 labs = data['labels']
-# y = data['y']
+y = data['y']
 train_test_split = data['train_test_split']
 preds, labs = rearrange_pred_labs(preds, labs, train_test_split)
 subs = more_data['subs']
@@ -213,20 +229,26 @@ dia_delta_time = diagnosis_data['delta_time']
 t0_diagnoses = t0_diagnoses[dia_delta_time>0]
 # filter to amyloid -
 amneg_filter = t0_suvr<0.79
+# filter to amyloid +
+ampos_filter = t0_suvr>0.79
 # filter to mildly a+
 perc_75 = 0.95665
-mildly_filter = (t0_suvr>0.79235) & (t0_suvr <perc_75)
+mildly_filter = (t0_suvr>0.79) & (t0_suvr <perc_75)
 severe_pos_filter = t0_suvr >= perc_75
-# filter to all cases
-all_filter = t0_suvr > -1
+
+all_filter = t0_suvr > -np.inf
+apoe_filter = apoe >= 4
+
 # choose filter to apply
-curr_filter = mildly_filter
+curr_filter = ampos_filter
 # apply filter
 labs = labs[curr_filter]
 preds = preds[curr_filter]
 subs = subs[curr_filter]
 t0_suvr = t0_suvr[curr_filter]
 t0_diagnoses = t0_diagnoses[curr_filter]
+delta_time = delta_time[curr_filter]
+apoe = apoe[curr_filter]
 
 # filter for unique subjects:
 _, unique_idxs = np.unique(subs, return_index=True)
@@ -246,17 +268,9 @@ _, unique_idxs = np.unique(subs, return_index=True)
 # to_ampos_subjects()
 
 # creating 100 subj study, how many are also top 100 pos change subject?
-filter_lab, filter_pred, filter_comb = get_matches_target(30, 30, True)
-# visualize_top_changes()
+filter_lab, filter_pred, filter_comb = get_matches_target(50, 50, True)
+visualize_top_changes()
 subjects = to_ampos_subjects(filter_pred)
-filter_lab, filter_pred, filter_comb = get_matches_target(61, 61, True)
-subjects = to_ampos_subjects(filter_pred)
-filter_lab, filter_pred, filter_comb = get_matches_target(30, 30, True)
-filter_lab, filter_pred, filter_comb = get_matches_target(16, 16, True)
-filter_lab, filter_pred, filter_comb = get_matches_target(64, 64, True)
-
-
-
 subjects = to_ampos_subjects(filter_lab)
 # 50 subj in study..
 filter_lab, filter_pred, filter_comb = get_matches_target(100, 20, True)
