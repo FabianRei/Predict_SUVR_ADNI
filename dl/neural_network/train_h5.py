@@ -36,7 +36,7 @@ def train_h5(h5_path, num_epochs=30, label_names=None, extra_info='', lr=0.01, d
              batch_size=32, binning=-1, regression=False, include_subject_ids=True, seed=-1, freeze_epochs=-1,
              use_resnext=False, use_resnet152=False, save_model=True, train_by_id = '', extract_features=False,
              threshold=1.11):
-    windows_db = True
+    windows_db = os.name == 'nt'
     if windows_db:
         h5_path = r'C:\Users\Fabian\stanford\fed_learning\federated_learning_data\slice_data_prediction.h5'
 
@@ -289,7 +289,7 @@ def train_h5(h5_path, num_epochs=30, label_names=None, extra_info='', lr=0.01, d
 
 if __name__ == '__main__':
     # this is done to run things from console
-    windows_db = True
+    windows_db = os.name == 'nt'
     if not windows_db:
         seed = 10
         job = {'extra_info': '', 'pretrained': True, 'label_names': ['label_suvr', 'label_amyloid'], 'regression': True, 'lr': 0.0001, 'seed': seed, 'save_model': False, 'use': True, 'batch_size': 4}
