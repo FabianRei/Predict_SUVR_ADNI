@@ -127,6 +127,39 @@ class ResNet50Reg(nn.Module):
             param.requires_grad = True
 
 
+class ResNet50RegMulti(nn.Module):
+    def __init__(self, pretrained=True, num_classes=1, num_input=3):
+        super().__init__()
+        self.channel_mean = torch.Tensor([0.485, 0.456, 0.406]).cuda().reshape(1, -1, 1, 1)
+        self.channel_std = torch.Tensor([0.229, 0.224, 0.225]).cuda().reshape(1, -1, 1, 1)
+        self.ResNet = models.resnet50(pretrained=pretrained)
+        self.pretrained = pretrained
+        # we assume multiples of 3
+        self.num_input = num_input
+        # pytorch's standard implementation throws errors at some image sizes (only in older versions)
+        self.ResNet.avgpool = nn.AdaptiveAvgPool2d(1)
+        self.ResNet.fc = nn.Linear(in_features=2048, out_features=num_classes, bias=True)
+
+
+    def forward(self, x):
+        """
+        Forward pass. Gray image is copied into pseudo 3dim rgb image and mean/std are adapted to
+        the ImageNet distribution
+
+        :param x:
+        :return:
+        """
+        # copy to 3 channels
+        if x.shape[1] == 1:
+            x = x.repeat(1, 3, 1, 1)
+        # substract imagenet mean and scale imagenet std
+        if self.pretrained:
+            x -= self.channel_mean
+            x /= self.channel_std
+        x = self.ResNet(x)
+        return x  # F.log_softmax(x, dim=1)
+
+
 if __name__ == '__main__':
     net = ResNet50Reg(pretrained=True, num_input=9)
     print('db')

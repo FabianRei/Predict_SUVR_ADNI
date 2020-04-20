@@ -21,6 +21,7 @@ def get_dataset(h5_path, label_names=['label_amyloid'], limit=-1, include_subjec
             labels[i].append(data[k].attrs[l])
     labels = [np.array(l) for l in labels]
     arrs = np.array(arrs)
+    data.close()
     return (arrs, *labels)
 
 

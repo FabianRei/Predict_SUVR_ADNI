@@ -5,6 +5,7 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.insert(0, parent_dir)
 
 from dl.neural_network.train_h5 import train_h5
+from dl.neural_network.train_h5_multi import train_h5 as train_h5_multi
 import GPUtil
 import multiprocessing as mp
 import time
@@ -28,14 +29,14 @@ def run_jobs(jobs):
                 for device in device_ids:
                     job = next(job_gen)
                     print(f"Running {job} on GPU {device}")
-                    sub_proc = mp.Process(target=train_h5, args=[job[0]], kwargs={'gpu_device': device, **job[1]})
+                    sub_proc = mp.Process(target=train_h5_multi, args=[job[0]], kwargs={'gpu_device': device, **job[1]})
                     process_dict[str(device)] = sub_proc
                     sub_proc.start()
             for device, proc in process_dict.items():
                 if not proc.is_alive():
                     job = next(job_gen)
                     print(f"Running {job} on GPU {device}")
-                    sub_proc = mp.Process(target=train_h5, args=[job[0]], kwargs={'gpu_device': device, **job[1]})
+                    sub_proc = mp.Process(target=train_h5_multi, args=[job[0]], kwargs={'gpu_device': device, **job[1]})
                     process_dict[str(device)] = sub_proc
                     sub_proc.start()
         except StopIteration:
@@ -50,11 +51,11 @@ def run_jobs(jobs):
 if __name__ == '__main__':
     full_start = time.time()
     # get activations
-    sub_folders = ['/scratch/reith/fl/experiments/feature_acs_more_train_data']
+    sub_folders = ['/scratch/reith/fl/experiments/feature_acs_multi']
     for sub in sub_folders:
         seed = 10
         jobs = [
-            {'extra_info': '', 'pretrained': True, 'label_names': ['label_0_79_suvr', 'label_amyloid'], 'regression': True,
+            {'extra_info': '', 'pretrained': True, 'label_names': ['multi_res_suvr_age_apoe', 'label_amyloid'], 'regression': True,
              'lr': 0.0001, 'seed': seed, 'save_model': True, 'batch_size': 32, 'extract_features': True,
              'threshold': 0.79}]
         h5_files = glob(f'{sub}/*.h5')
@@ -122,6 +123,25 @@ r'''
 ###############################################
 ######Past runs################################
 ###############################################
+if __name__ == '__main__':
+    full_start = time.time()
+    # get activations
+    sub_folders = ['/scratch/reith/fl/experiments/feature_acs_multi']
+    for sub in sub_folders:
+        seed = 10
+        jobs = [
+            {'extra_info': '', 'pretrained': True, 'label_names': ['label_0_79_suvr', 'label_amyloid'], 'regression': True,
+             'lr': 0.0001, 'seed': seed, 'save_model': True, 'batch_size': 32, 'extract_features': True,
+             'threshold': 0.79}]
+        h5_files = glob(f'{sub}/*.h5')
+        # import pdb; pdb.set_trace()
+        print(h5_files)
+        for h5_file in h5_files:
+            process_jobs = [(h5_file, job) for job in jobs]
+            print(process_jobs)
+            run_jobs(process_jobs)
+    print(f"Whole program finished! It took {str(datetime.timedelta(seconds=time.time() - full_start))} hours:min:seconds")
+##############################################################################
 if __name__ == '__main__':
     full_start = time.time()
     # run on smaller resnext with higher batch size

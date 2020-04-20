@@ -22,7 +22,7 @@ def get_id(ids, key):
 
 
 # label_path = '/share/wandell/data/reith/federated_learning/labels_detailled.pickle'
-h5_path = r'C:\Users\Fabian\stanford\fed_learning\federated_learning_data\slice_data_longitudinal_fixed_multi.h5'
+h5_path = r'C:\Users\Fabian\stanford\fed_learning\federated_learning_data\slice_data_longitudinal_fixed_multi_no_onehot22.h5'
 
 data = h5py.File(h5_path, 'r+')
 
@@ -108,12 +108,11 @@ for a1, a2 in zip(apoea1, apoea2):
         apoe.append(2)
 
 apoe = np.array(apoe)
-one_hot = preprocessing.OneHotEncoder()
-apoe_oh = one_hot.fit_transform(apoe.reshape(-1, 1)).toarray()
+
 
 multi_result = []
-for suvr, ag, ap in zip(composite_suvr, ages, apoe_oh):
-    multi_result.append([suvr] + [ag] + list(ap))
+for suvr, ag, ap in zip(composite_suvr, ages, apoe):
+    multi_result.append([suvr] + [ag] + [ap])
 
 
 for i, k in enumerate(data_keys):
