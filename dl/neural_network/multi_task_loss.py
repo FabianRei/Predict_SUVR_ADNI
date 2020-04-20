@@ -22,7 +22,7 @@ class CustomMultiWrapper:
         comb_loss = torch.stack([curr_loss_suvr, curr_loss_age, curr_loss_apoe])
         multi_task_loss = self.multi_loss(comb_loss)
         # return multi_task_loss
-        return curr_loss_suvr
+        return multi_task_loss
 
     def to_train(self):
         self.multi_loss.train()
@@ -47,11 +47,11 @@ class MultiTaskLoss(torch.nn.Module):
     coeffs = 1 / ( (self.is_regression+1)*(stds**2) )
     multi_task_losses = coeffs*losses + torch.log(stds)
 
-    if self.reduction == 'sum':
-      multi_task_losses = multi_task_losses.sum()
-    if self.reduction == 'mean':
-      multi_task_losses = multi_task_losses.mean()
-    return multi_task_losses
+    # if self.reduction == 'sum':
+    #   multi_task_losses = multi_task_losses.sum()
+    # if self.reduction == 'mean':
+    #   multi_task_losses = multi_task_losses.mean()
+    return multi_task_losses[0]
 
 '''
 usage
