@@ -56,7 +56,7 @@ if __name__ == '__main__':
         seed = 10
         jobs = [
             {'extra_info': '', 'pretrained': True, 'label_names': ['label_0_79_suvr', 'label_amyloid'], 'regression': True,
-             'lr': 0.0001, 'seed': seed, 'save_model': True, 'batch_size': 32, 'extract_features': True, 'use_multi_resnet': False,
+             'lr': 0.0001, 'seed': seed, 'save_model': True, 'batch_size': 32, 'extract_features': True,
              'threshold': 0.79}]
         h5_files = glob(f'{sub}/*.h5')
         # import pdb; pdb.set_trace()
