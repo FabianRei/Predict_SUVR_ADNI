@@ -29,14 +29,14 @@ def run_jobs(jobs):
                 for device in device_ids:
                     job = next(job_gen)
                     print(f"Running {job} on GPU {device}")
-                    sub_proc = mp.Process(target=train_h5_multi, args=[job[0]], kwargs={'gpu_device': device, **job[1]})
+                    sub_proc = mp.Process(target=train_h5, args=[job[0]], kwargs={'gpu_device': device, **job[1]})
                     process_dict[str(device)] = sub_proc
                     sub_proc.start()
             for device, proc in process_dict.items():
                 if not proc.is_alive():
                     job = next(job_gen)
                     print(f"Running {job} on GPU {device}")
-                    sub_proc = mp.Process(target=train_h5_multi, args=[job[0]], kwargs={'gpu_device': device, **job[1]})
+                    sub_proc = mp.Process(target=train_h5, args=[job[0]], kwargs={'gpu_device': device, **job[1]})
                     process_dict[str(device)] = sub_proc
                     sub_proc.start()
         except StopIteration:
