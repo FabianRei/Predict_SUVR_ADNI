@@ -17,7 +17,7 @@ import multiprocessing as mp
 if os.name == 'nt':
     in_path = r'C:\Users\Fabian\stanford\fed_learning\rsync\fl\rf_data_train_test_crossval.pickle'
 else:
-    in_path = '/share/wandell/data/reith/gbdt/rf_data_train_test_crossval.pickle'
+    in_path = '/share/wandell/data/reith/gbdt/rf_data_train_test_crossval_more_trained_activations.pickle'
 with open(in_path, 'rb') as f:
     data = pickle.load(f)
 
@@ -54,7 +54,7 @@ params = {
 #     cross_validation_gbdt(data, params, activations=False, cval_range=5)
 #
 # print('done')
-with_activations = False
+with_activations = True
 
 if not with_activations:
     params['learning_rate'] = 0.0006
@@ -67,9 +67,8 @@ else:
 # cross_validation_gbdt(data, params, activations=False, cval_range=5, exclude='sex')
 #
 
-for i in range(2, 12):
-    params['max_depth'] = i
-    cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, extra_folder='depths2')
+
+cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, extra_folder='more_train')
 
 # params['max_depth'] = 4
 #
