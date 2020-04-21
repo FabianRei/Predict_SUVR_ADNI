@@ -50,9 +50,9 @@ class MultiTaskLoss(torch.nn.Module):
 
     # if self.reduction == 'sum':
     #   multi_task_losses = multi_task_losses.sum()
-    # if self.reduction == 'mean':
-    #   multi_task_losses = multi_task_losses.mean()
-    return multi_task_losses[0]
+    if self.reduction == 'mean':
+      multi_task_losses = multi_task_losses.mean()
+    return multi_task_losses
 
 '''
 usage
