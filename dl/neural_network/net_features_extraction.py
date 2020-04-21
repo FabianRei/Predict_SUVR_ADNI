@@ -44,9 +44,9 @@ def get_net_features(Net, data_in, labels_in, img_ids):
         net_out = Net(data)
         prediction = net_out[:, 0].detach().cpu().numpy()
         testAcc = list(((prediction-target.cpu().numpy())**2))
-        if not sum(testAcc) == len(target) and False:
-            print(prediction.cpu().numpy()[testAcc == 0])
-            print(target.cpu().numpy()[testAcc==0])
+        # if not sum(testAcc) == len(target) and False:
+        #     print(prediction.cpu().numpy()[testAcc == 0])
+        #     print(target.cpu().numpy()[testAcc==0])
         allAccuracy.extend(testAcc)
         predictions.extend(prediction)
         labels.extend(target)
@@ -55,8 +55,8 @@ def get_net_features(Net, data_in, labels_in, img_ids):
     predictions = [float(p) for p in predictions]
     test_labels = [float(l) for l in labels_in]
     activations = outputs
-    tt = np.mean(allAccuracy), np.stack((predictions, test_labels)).T
-    tt = np.mean(allAccuracy)
+    # tt = np.mean(allAccuracy), np.stack((predictions, test_labels)).T
+    # tt = np.mean(allAccuracy)
     result = {}
     for i, img_id in enumerate(img_ids):
         if i >= len(predictions):
