@@ -21,6 +21,7 @@ else:
     # in_path = '/share/wandell/data/reith/gbdt/rf_data_train_test_crossval_more_trained_activations.pickle'
     in_path = '/share/wandell/data/reith/gbdt/rf_data_train_test_crossval_more_trained_activations_multi.pickle'
     in_path = '/share/wandell/data/reith/gbdt/rf_data_train_test_crossval_more_trained_activations_multi_weighted.pickle'
+    in_path = '/share/wandell/data/reith/gbdt/rf_data_train_test_crossval_better_weighting.pickle'
 with open(in_path, 'rb') as f:
     data = pickle.load(f)
 
@@ -71,7 +72,7 @@ else:
 #
 
 
-cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, extra_folder='more_train_multi_better_weighted')
+cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, extra_folder='better_weighting')
 
 # params['max_depth'] = 4
 #
