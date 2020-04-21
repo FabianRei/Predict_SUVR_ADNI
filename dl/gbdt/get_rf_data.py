@@ -50,7 +50,7 @@ def get_id(name):
 
 
 fp_pickle = r'C:\Users\Fabian\stanford\fed_learning\federated_learning_data\xml_labels_detailled_suvr_longitudinal_times_fixed.pickle'
-fp = r'C:\Users\Fabian\stanford\fed_learning\federated_learning_data\fc_activations_more_train.pickle'
+fp = r'C:\Users\Fabian\stanford\fed_learning\federated_learning_data\fc_activations_more_train_multi.pickle'
 
 with open(fp_pickle, 'rb') as f:
     labels = pickle.load(f)
@@ -138,7 +138,7 @@ for s in np.unique(res_dict['subs']):
         test[samples] = 3
     if len(test)*0.2>np.sum(test==4):
         test[samples] = 4
-out_path = r'C:\Users\Fabian\stanford\fed_learning\rsync\fl\rf_data_train_test_crossval_more_trained_activations.pickle'
+out_path = r'C:\Users\Fabian\stanford\fed_learning\rsync\fl\rf_data_train_test_crossval_more_trained_activations_multi.pickle'
 res_dict['test'] = test
 with open(out_path, 'wb') as f:
     pickle.dump(res_dict, f)

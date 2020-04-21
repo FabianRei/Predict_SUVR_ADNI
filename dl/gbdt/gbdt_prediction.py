@@ -18,7 +18,8 @@ if os.name == 'nt':
     in_path = r'C:\Users\Fabian\stanford\fed_learning\rsync\fl\rf_data_train_test_crossval.pickle'
 else:
     # in_path = '/share/wandell/data/reith/gbdt/rf_data_train_test_crossval.pickle'
-    in_path = '/share/wandell/data/reith/gbdt/rf_data_train_test_crossval_more_trained_activations.pickle'
+    # in_path = '/share/wandell/data/reith/gbdt/rf_data_train_test_crossval_more_trained_activations.pickle'
+    in_path = '/share/wandell/data/reith/gbdt/rf_data_train_test_crossval_more_trained_activations_multi.pickle'
 with open(in_path, 'rb') as f:
     data = pickle.load(f)
 
