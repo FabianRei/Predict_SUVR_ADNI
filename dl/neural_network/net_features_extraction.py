@@ -48,12 +48,15 @@ def get_net_features(Net, data_in, labels_in, img_ids):
         #     print(prediction.cpu().numpy()[testAcc == 0])
         #     print(target.cpu().numpy()[testAcc==0])
         allAccuracy.extend(testAcc)
-        predictions.extend(prediction)
+        predictions.extend(net_out)
         labels.extend(target)
     Net.train()
     print(f"Test accuracy is {np.mean(allAccuracy)}")
-    predictions = [float(p) for p in predictions]
-    test_labels = [float(l) for l in labels_in]
+    predictions = torch.stack(predictions).cpu().detach().numpy()
+    apoe_pred = np.apply_along_axis(np.argmax, 1, predictions[:, 2:])
+    predictions = np.concatenate((predictions[:, :2], apoe_pred.reshape(-1, 1)), axis=1)
+    # predictions = [float(p) for p in predictions]
+    test_labels = labels_in
     activations = outputs
     # tt = np.mean(allAccuracy), np.stack((predictions, test_labels)).T
     # tt = np.mean(allAccuracy)
