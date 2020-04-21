@@ -43,6 +43,7 @@ class MultiTaskLoss(torch.nn.Module):
   def forward(self, losses):
     dtype = losses.dtype
     device = losses.device
+    print(losses)
     stds = (torch.exp(self.log_vars)**(1/2)).to(device).to(dtype)
     self.is_regression = self.is_regression.to(device).to(dtype)
     coeffs = 1 / ( (self.is_regression+1)*(stds**2) )
