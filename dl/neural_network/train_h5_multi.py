@@ -262,8 +262,9 @@ def train_h5(h5_path, num_epochs=30, label_names=None, extra_info='', lr=0.01, d
             print(f"Trainig for {decrease_after} epochs with a learning rate of {lr}..")
         if use_multi_resnet:
             multi_params = list(Net.parameters()) + list(criterion.multi_loss.parameters())
-        else:
             optimizer = optim.Adam(multi_params, lr=lr)
+        else:
+            optimizer = optim.Adam(Net.parameters(), lr=lr)
         train_result = train_func(batch_size=batch_size, train_data=train_data, train_labels=train_labels, test_data=test_data,
                                   test_labels=test_labels, Net=Net, optimizer=optimizer, criterion=criterion,
                                   test_interval=1, epochs=1, dim_in='default')
