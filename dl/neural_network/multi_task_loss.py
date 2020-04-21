@@ -22,7 +22,6 @@ class CustomMultiWrapper:
         curr_loss_suvr = self.loss_suvr(suvr_net, suvr_y)
         comb_loss = torch.stack([curr_loss_suvr, curr_loss_age, curr_loss_apoe])
         multi_task_loss = self.multi_loss(comb_loss)
-        print(multi_task_loss)
         # return multi_task_loss
         return multi_task_loss
 
@@ -48,7 +47,7 @@ class MultiTaskLoss(torch.nn.Module):
     self.is_regression = self.is_regression.to(device).to(dtype)
     coeffs = 1 / ( (self.is_regression+1)*(stds**2) )
     multi_task_losses = coeffs*losses + torch.log(stds)
-
+    print(multi_task_losses)
     # if self.reduction == 'sum':
     #   multi_task_losses = multi_task_losses.sum()
     if self.reduction == 'mean':
