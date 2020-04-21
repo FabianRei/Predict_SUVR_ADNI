@@ -12,8 +12,9 @@ class CustomMultiWrapper:
     def __call__(self, net_out, target):
         suvr_net = net_out[:, 0]
         suvr_y = target[:, 0]
-        age_net = net_out[:, 1]
-        age_y = target[:, 1]
+        # divide by 100 for similar size to suvr
+        age_net = net_out[:, 1]/100
+        age_y = target[:, 1]/100
         apoe_net = net_out[:, 2:]
         apoe_y = target[:, 2]
         curr_loss_apoe = self.loss_apoe(apoe_net, apoe_y.long())
