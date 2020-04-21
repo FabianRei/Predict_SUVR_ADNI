@@ -21,9 +21,9 @@ class CustomMultiWrapper:
         curr_loss_age = self.loss_age(age_net, age_y)
         curr_loss_suvr = self.loss_suvr(suvr_net, suvr_y)
         # suvr loss is generally quite a bit smaller..
-        curr_loss_suvr = curr_loss_suvr*20
+        curr_loss_suvr = curr_loss_suvr*50
         curr_loss_age = curr_loss_age/10
-        curr_loss_apoe = curr_loss_apoe/5
+        curr_loss_apoe = curr_loss_apoe/20
         comb_loss = torch.stack([curr_loss_suvr, curr_loss_age, curr_loss_apoe])
         # multi_task_loss = self.multi_loss(comb_loss)
         print(comb_loss)
