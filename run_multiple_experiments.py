@@ -51,7 +51,7 @@ def run_jobs(jobs):
 if __name__ == '__main__':
     full_start = time.time()
     # get activations
-    sub_folders = ['/scratch/reith/fl/experiments/multi_learning_fucking_works']
+    sub_folders = ['/scratch/reith/fl/experiments/mult_learning_weighted']
     for sub in sub_folders:
         seed = 10
         jobs = [
