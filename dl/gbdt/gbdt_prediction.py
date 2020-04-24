@@ -18,11 +18,11 @@ if os.name == 'nt':
     in_path = r'C:\Users\Fabian\stanford\fed_learning\rsync\fl\rf_data_train_test_crossval.pickle'
 else:
     # in_path = '/share/wandell/data/reith/gbdt/rf_data_train_test_crossval.pickle'
-    # in_path = '/share/wandell/data/reith/gbdt/rf_data_train_test_crossval_more_trained_activations.pickle'
+    in_path = '/share/wandell/data/reith/gbdt/rf_data_train_test_crossval_more_trained_activations.pickle'
     # in_path = '/share/wandell/data/reith/gbdt/rf_data_train_test_crossval_more_trained_activations_multi.pickle'
     # in_path = '/share/wandell/data/reith/gbdt/rf_data_train_test_crossval_more_trained_activations_multi_weighted.pickle'
     # in_path = '/share/wandell/data/reith/gbdt/rf_data_train_test_crossval_better_weighting.pickle'
-    in_path = '/share/wandell/data/reith/gbdt/rf_data_train_test_crossval_random_acs.pickle'
+    # in_path = '/share/wandell/data/reith/gbdt/rf_data_train_test_crossval_random_acs.pickle'
 with open(in_path, 'rb') as f:
     data = pickle.load(f)
 
@@ -73,7 +73,7 @@ else:
 #
 
 
-cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, extra_folder='random_acs')
+# cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, extra_folder='random_acs')
 
 # params['max_depth'] = 4
 #
@@ -82,10 +82,10 @@ cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, 
 #     cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, extra_folder='lr2')
 
 
-# features = ['t0_suvr', 'sex', 'weight', 'delta_time', 'apoe', 'mmsescore', 'faqtotal', 'age']
-# for f in features:
-#     cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, exclude=f, extra_folder='exclusions_wo_acs4')
-# cross_validation_gbdt(data, params, activations=False, cval_range=5)
+features = ['t0_suvr', 'sex', 'weight', 'delta_time', 'apoe', 'mmsescore', 'faqtotal', 'age']
+for f in features:
+    cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, exclude=f, extra_folder='exclusions_more_train_acs')
+cross_validation_gbdt(data, params, activations=True, cval_range=5)
 #test
 # # new params: 0.009 lr, its 2000, max_depth 9, min_data_in_leaf 9
 # params['learning_rate'] = 0.0006
