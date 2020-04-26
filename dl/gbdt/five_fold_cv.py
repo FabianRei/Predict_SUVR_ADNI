@@ -87,6 +87,7 @@ def cross_validation_gbdt(data, params, activations=False, cval_range=5, exclude
         # delete all meta-features except delta time
         if exclude == 'all':
             x = np.delete(x, [0,1,2,4,5,6,7], axis=1)
+            cat_features = []
         else:
             excl_index = x_names.index(exclude)
             if excl_index in cat_features:
