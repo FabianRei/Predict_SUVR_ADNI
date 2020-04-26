@@ -73,7 +73,7 @@ else:
 #
 
 
-# cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, extra_folder='exclusions_more_train_acs')
+cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, exclude='all', extra_folder='exclusions_more_train_acs')
 
 # params['max_depth'] = 4
 #
@@ -88,23 +88,23 @@ else:
 # cross_validation_gbdt(data, params, activations=True, cval_range=5)
 #test
 # new params: 0.009 lr, its 2000, max_depth 9, min_data_in_leaf 9
-params['learning_rate'] = 0.0006
-params['num_iterations'] = 4000
-params['min_data_in_leaf'] = 9
+# params['learning_rate'] = 0.0045
+# params['num_iterations'] = 4000
+# params['min_data_in_leaf'] = 9
 # params['max_depth'] = 4 # 11 also quite good
 # cross_validation_gbdt(data, params, activations=True, cval_range=5)
-for i in range(6, 12, 1):
-    params['max_depth'] = i
-    print(params)
-    cross_validation_gbdt(data, params, activations=True, cval_range=5, extra_folder='activations_find_good_depths')
-
-params['max_depth'] = 9
-params['min_data_in_leaf'] = 9
-# params['boosting_type'] = 'dart'
-for i in range(5, 70, 5):
-    params['learning_rate'] = 0.0001*i
-    cross_validation_gbdt(data, params, activations=True, cval_range=5, extra_folder='activations_find_good_lr')
+# for i in range(6, 12, 1):
+#     params['max_depth'] = i
+#     print(params)
+#     cross_validation_gbdt(data, params, activations=True, cval_range=5, extra_folder='activations_find_good_depths')
 #
+# params['max_depth'] = 9
+# params['min_data_in_leaf'] = 9
+# # params['boosting_type'] = 'dart'
+# for i in range(5, 70, 5):
+#     params['learning_rate'] = 0.0001*i
+#     cross_validation_gbdt(data, params, activations=True, cval_range=5, extra_folder='activations_find_good_lr')
+# #
 # params['max_depth'] = 11
 # params['min_data_in_leaf'] = 9
 # # params['boosting_type'] = 'dart'

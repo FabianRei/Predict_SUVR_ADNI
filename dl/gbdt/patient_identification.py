@@ -7,6 +7,8 @@ from matplotlib import pyplot as plt
 import seaborn as sns
 from sklearn.metrics import mean_squared_error
 
+def rmse(target, prediction):
+    return mean_squared_error(target, prediction)**0.5
 
 def rearrange_pred_labs(preds, labs, train_test_split):
     preds = [list(p) for p in preds]
@@ -165,16 +167,32 @@ def visualize_top_changes():
     sns.distplot(changes, color=colors[3])
     print('db')
 
+
+def changing_diagnosis(t0_diagnoses, diagnoses, subs):
+    change_to_severe = []
+    all_follow_up_rating = 0
+    for s in np.unique(subs):
+        t0_dig = t0_diagnoses[subs==s]
+        diags = diagnoses[subs==s]
+        diff = diags-t0_dig
+        print(diags)
+        if diff.max()>0:
+            change_to_severe.append(diff.max())
+    print(f'{len(change_to_severe)} subjects changed to a more severe CDR rating')
+    return change_to_severe
+
 # results file (pickle) with predictions
-gbdt_results = r'C:\Users\Fabian\stanford\gbdt\rsync\.special\1576022195_w_acs__0_03478181179857318\all_results.pickle'
+# gbdt_results = r'C:\Users\Fabian\stanford\gbdt\rsync\.special\1576022195_w_acs__0_03478181179857318\all_results.pickle'
+gbdt_results = r'C:\Users\Fabian\stanford\fed_learning\federated_learning_data\more_train\1587473346_w_acs__0_033932022300775154\all_results.pickle'
+# gbdt_results = r'C:\Users\Fabian\stanford\fed_learning\federated_learning_data\better_weighting\1587490519_w_acs__0_03409988352699489\all_results.pickle'
 lin_reg_results = r'C:\Users\Fabian\stanford\gbdt\rsync\.special\linear_regression\all_results.pickle'
 gbdt_no_acs_results = r'C:\Users\Fabian\stanford\gbdt\rsync\.special\1576073951_wo_acs__0_0354701097223875\all_results.pickle'
 
 ################################################################
 ################################################################
-selected_results = gbdt_no_acs_results
+selected_results = lin_reg_results
 # file with additional metadata
-additional_data = r'C:\Users\Fabian\stanford\fed_learning\rsync\fl\rf_data_train_test_crossval.pickle'
+additional_data = r'C:\Users\Fabian\stanford\fed_learning\rsync\fl\rf_data_train_test_crossval_more_trained_activations.pickle'
 # path_detailled_data = r'C:\Users\Fabian\stanford\fed_learning\federated_learning_data\test_meta_data_complete.pickle'
 # diagnostic data:
 path_diagnosis_data = 'C:\\Users\\Fabian\\stanford\\diagnoses_DXSUM.pickle'
@@ -209,18 +227,36 @@ dia_subs = diagnosis_data['subs']
 diagnoses = diagnosis_data['diagnoses']
 t0_diagnoses = diagnosis_data['t0_diagnoses']
 dia_delta_time = diagnosis_data['delta_time']
-# filter to data points, not t0 only
+
 t0_diagnoses = t0_diagnoses[dia_delta_time>0]
+# apoe = apoe[dia_delta_time>0]
+# apoe
+apoe_filter = apoe >= 4
+# filter by t0_diagnoses mild dementia
+mild_dementia_filter = t0_diagnoses == 0.5
+
+# filter to worse dementia
+worse_dementa_filter = t0_diagnoses > 0.5
+# filter to data points, not t0 only
 # filter to amyloid -
 amneg_filter = t0_suvr<0.79
+# filter to amyloid +
+ampos_filter = t0_suvr>0.79
 # filter to mildly a+
-perc_75 = 0.95665
-mildly_filter = (t0_suvr>0.79235) & (t0_suvr <perc_75)
-severe_pos_filter = t0_suvr >= perc_75
+perc_50pos = 0.9535
+mildly_pos_filter = (t0_suvr>0.79) & (t0_suvr <perc_50pos)
+
+#filter to mildly a-
+perc_50neg =  0.7390000000000001
+mildly_neg_filter = (t0_suvr<0.79) & (t0_suvr > perc_50neg
+                                  )
+severe_pos_filter = t0_suvr >= perc_50pos
 # filter to all cases
 all_filter = t0_suvr > -1
+#############################################
+############################################
 # choose filter to apply
-curr_filter = mildly_filter
+curr_filter = mild_dementia_filter
 # apply filter
 labs = labs[curr_filter]
 preds = preds[curr_filter]
@@ -230,7 +266,7 @@ t0_diagnoses = t0_diagnoses[curr_filter]
 
 # filter for unique subjects:
 _, unique_idxs = np.unique(subs, return_index=True)
-
+print(f'{len(unique_idxs)} subjects')
 # look at highest suvr amyloid- subjects
 # changes, filter_idxs, t0_suvr_ind = get_unique_changes(labs, subs, t0_suvr=t0_suvr)
 # sort_idxs = np.argsort(t0_suvr_ind)[::-1]
@@ -244,15 +280,15 @@ _, unique_idxs = np.unique(subs, return_index=True)
 # subs = subs[questionable_dia_filter]
 # t0_suvr = t0_suvr[questionable_dia_filter]
 # to_ampos_subjects()
-
+print(f'rmse is {rmse(labs,preds)}')
 # creating 100 subj study, how many are also top 100 pos change subject?
-filter_lab, filter_pred, filter_comb = get_matches_target(30, 30, True)
+filter_lab, filter_pred, filter_comb = get_matches_target(46, 46, True)
 # visualize_top_changes()
 subjects = to_ampos_subjects(filter_pred)
 filter_lab, filter_pred, filter_comb = get_matches_target(61, 61, True)
 subjects = to_ampos_subjects(filter_pred)
 filter_lab, filter_pred, filter_comb = get_matches_target(30, 30, True)
-filter_lab, filter_pred, filter_comb = get_matches_target(16, 16, True)
+filter_lab, filter_pred, filter_comb = get_matches_target(31, 31, True)
 filter_lab, filter_pred, filter_comb = get_matches_target(64, 64, True)
 
 

@@ -84,14 +84,18 @@ def cross_validation_gbdt(data, params, activations=False, cval_range=5, exclude
     cat_features = [1, 4, 5, 6]
 
     if exclude != '':
-        excl_index = x_names.index(exclude)
-        if excl_index in cat_features:
-            cat_features.remove(excl_index)
-        x_names.pop(excl_index)
-        x = np.delete(x, excl_index, axis=1)
-        for i, f in enumerate(cat_features):
-            if f > excl_index:
-                cat_features[i] = f-1
+        # delete all meta-features except delta time
+        if exclude == 'all':
+            x = np.delete(x, [0,1,2,4,5,6,7], axis=1)
+        else:
+            excl_index = x_names.index(exclude)
+            if excl_index in cat_features:
+                cat_features.remove(excl_index)
+            x_names.pop(excl_index)
+            x = np.delete(x, excl_index, axis=1)
+            for i, f in enumerate(cat_features):
+                if f > excl_index:
+                    cat_features[i] = f-1
     print(x_names)
     res = {'predictions': [], 'labels': [], 'rmse': [], 'pred_train': [], 'labels_train': [],
            'rmse_train': [], 'rmse_mean': [], 'rmse_mean_train': [], 'gbm': []}
