@@ -73,7 +73,7 @@ else:
 #
 
 
-cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, extra_folder='exclusions_more_train_acs')
+# cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, extra_folder='exclusions_more_train_acs')
 
 # params['max_depth'] = 4
 #
@@ -92,8 +92,7 @@ params['learning_rate'] = 0.0006
 params['num_iterations'] = 4000
 params['min_data_in_leaf'] = 9
 # params['max_depth'] = 4 # 11 also quite good
-cross_validation_gbdt(data, params, activations=True, cval_range=5)
-sub_processes = []
+# cross_validation_gbdt(data, params, activations=True, cval_range=5)
 for i in range(6, 12, 1):
     params['max_depth'] = i
     print(params)
