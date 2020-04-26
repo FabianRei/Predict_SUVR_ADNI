@@ -73,7 +73,7 @@ else:
 #
 
 
-cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, exclude='all', extra_folder='exclusions_more_train_acs')
+cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, exclude='all', extra_folder='exclusions_all_meta')
 
 # params['max_depth'] = 4
 #
