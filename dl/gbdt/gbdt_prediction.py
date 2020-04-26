@@ -11,7 +11,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from dl.gbdt.five_fold_cv import cross_validation_gbdt
 import multiprocessing as mp
-
+import time
 
 # in_path = r'C:\Users\Fabian\stanford\fed_learning\rsync\fl\rf_data_train_test.pickle'
 if os.name == 'nt':
@@ -72,9 +72,9 @@ else:
 # cross_validation_gbdt(data, params, activations=False, cval_range=5, exclude='sex')
 #
 
-
-cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, exclude='all', extra_folder='exclusions_all_meta')
-
+ti = time.time()
+cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, extra_folder='test_time')
+print(f'took {time.time()-ti} seconds')
 # params['max_depth'] = 4
 #
 # for i in range(1, 60):
