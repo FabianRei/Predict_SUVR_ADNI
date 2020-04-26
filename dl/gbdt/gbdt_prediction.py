@@ -73,7 +73,7 @@ else:
 #
 
 ti = time.time()
-cross_validation_gbdt(data, params, activations=with_activations, cval_range=5, extra_folder='test_time')
+cross_validation_gbdt(data, params, activations=with_activations, exclude='all', cval_range=5, extra_folder='no_metadata')
 print(f'took {time.time()-ti} seconds')
 # params['max_depth'] = 4
 #
