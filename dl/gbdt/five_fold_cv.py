@@ -82,7 +82,7 @@ def cross_validation_gbdt(data, params, activations=False, cval_range=5, exclude
     params['verbose'] = -1
     x, y, train_test_split, x_names = get_xy(data, activations, exclude='')
     cat_features = [1, 4, 5, 6]
-
+    
     if exclude != '':
         # delete all meta-features except delta time
         if exclude == 'all':

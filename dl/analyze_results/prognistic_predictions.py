@@ -146,6 +146,7 @@ def rmse_over_time():
         time_filter = (delta_time_yrs>=start) & (delta_time_yrs < end)
         time_preds = preds[time_filter]
         time_labs = labs[time_filter]
+        print(start, end, len(time_labs))
         results.append(rmse(time_preds, time_labs))
     print(results)
     return 0
@@ -187,6 +188,13 @@ folders = glob(os.path.join(target_folder, '157*'))
 
 folder = folders[-1]
 target = os.path.join(folder, target_file)
+gbdt_w_acs = r'C:\Users\Fabian\stanford\fed_learning\federated_learning_data\more_train\1587473346_w_acs__0_033932022300775154\all_results.pickle'
+gbdt_no_acs_results = r'C:\Users\Fabian\stanford\gbdt\rsync\.special\1576073951_wo_acs__0_0354701097223875\all_results.pickle'
+lin_reg_results = r'C:\Users\Fabian\stanford\gbdt\rsync\.special\linear_regression\all_results.pickle'
+
+target = lin_reg_results
+
+
 with open(target, 'rb') as f:
     data = pickle.load(f)
 
@@ -198,11 +206,11 @@ path_detailled_data = r'C:\Users\Fabian\stanford\fed_learning\federated_learning
 with open(path_detailled_data, 'rb') as f:
     detailled_data = pickle.load(f)
 
-gbms = data['gbm']
-x_names = data['x_names']
+# gbms = data['gbm']
+# x_names = data['x_names']
 preds = data['predictions']
 labs = data['labels']
-y = data['y']
+# y = data['y']
 train_test_split = data['train_test_split']
 preds, labs = rearrange_pred_labs(preds, labs, train_test_split)
 subs = more_data['subs']
@@ -238,9 +246,13 @@ rmse_over_time()
 
 # filter to amyloid -
 amneg_filter = t0_suvr<0.79
-labs = labs[amneg_filter]
-preds = preds[amneg_filter]
-subs = subs[amneg_filter]
+ampos_filter = t0_suvr>0.79
+
+
+target_filter = amneg_filter
+labs = labs[target_filter]
+preds = preds[target_filter]
+subs = subs[target_filter]
 t0_suvr = t0_suvr[amneg_filter]
 to_ampos_subjects()
 # creating 100 subj study, how many are also top 100 pos change subject?

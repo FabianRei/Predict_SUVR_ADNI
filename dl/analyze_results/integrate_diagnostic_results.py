@@ -141,6 +141,7 @@ def rmse_over_time():
         time_filter = (delta_time_yrs>=start) & (delta_time_yrs < end)
         time_preds = preds[time_filter]
         time_labs = labs[time_filter]
+        print(len(time_preds))
         results.append(rmse(time_preds, time_labs))
     print(results)
     return 0
