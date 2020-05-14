@@ -190,7 +190,7 @@ gbdt_no_acs_results = r'C:\Users\Fabian\stanford\gbdt\rsync\.special\1576073951_
 
 ################################################################
 ################################################################
-selected_results = lin_reg_results
+selected_results = gbdt_no_acs_results
 # file with additional metadata
 additional_data = r'C:\Users\Fabian\stanford\fed_learning\rsync\fl\rf_data_train_test_crossval_more_trained_activations.pickle'
 # path_detailled_data = r'C:\Users\Fabian\stanford\fed_learning\federated_learning_data\test_meta_data_complete.pickle'
@@ -234,6 +234,10 @@ t0_diagnoses = t0_diagnoses[dia_delta_time>0]
 apoe_filter = apoe >= 4
 # filter by t0_diagnoses mild dementia
 mild_dementia_filter = t0_diagnoses == 0.5
+normal_cdr = t0_diagnoses == 0
+less_mild_dementia = t0_diagnoses == 1
+moderate_dementia = t0_diagnoses == 2
+severe_dementia = t0_diagnoses == 3
 
 # filter to worse dementia
 worse_dementa_filter = t0_diagnoses > 0.5
@@ -256,7 +260,7 @@ all_filter = t0_suvr > -1
 #############################################
 ############################################
 # choose filter to apply
-curr_filter = mild_dementia_filter
+curr_filter = all_filter
 # apply filter
 labs = labs[curr_filter]
 preds = preds[curr_filter]
@@ -266,6 +270,7 @@ t0_diagnoses = t0_diagnoses[curr_filter]
 
 # filter for unique subjects:
 _, unique_idxs = np.unique(subs, return_index=True)
+print(np.mean(labs), np.mean(t0_suvr[unique_idxs]), len(unique_idxs))
 print(f'{len(unique_idxs)} subjects')
 # look at highest suvr amyloid- subjects
 # changes, filter_idxs, t0_suvr_ind = get_unique_changes(labs, subs, t0_suvr=t0_suvr)

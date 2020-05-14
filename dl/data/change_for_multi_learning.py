@@ -22,7 +22,7 @@ def get_id(ids, key):
 
 
 # label_path = '/share/wandell/data/reith/federated_learning/labels_detailled.pickle'
-h5_path = r'C:\Users\Fabian\stanford\fed_learning\federated_learning_data\slice_data_longitudinal_fixed_multi_no_onehot22.h5'
+h5_path = r'C:\Users\Fabian\stanford\fed_learning\federated_learning_data\slice_data_longitudinal_fixed_multi_no_onehot.h5'
 
 data = h5py.File(h5_path, 'r+')
 

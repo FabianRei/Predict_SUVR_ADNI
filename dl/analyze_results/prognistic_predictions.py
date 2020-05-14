@@ -140,10 +140,13 @@ def rmse_over_time():
     global delta_time
     delta_time_yrs = delta_time/(365*24*60*60)
     results = []
-    for i in range(4):
+    for i in range(3):
         start = 1+i*2
         end = 3+i*2
-        time_filter = (delta_time_yrs>=start) & (delta_time_yrs < end)
+        if start == 5:
+            time_filter = (delta_time_yrs >= start)
+        else:
+            time_filter = (delta_time_yrs>=start) & (delta_time_yrs < end)
         time_preds = preds[time_filter]
         time_labs = labs[time_filter]
         print(start, end, len(time_labs))
@@ -192,7 +195,7 @@ gbdt_w_acs = r'C:\Users\Fabian\stanford\fed_learning\federated_learning_data\mor
 gbdt_no_acs_results = r'C:\Users\Fabian\stanford\gbdt\rsync\.special\1576073951_wo_acs__0_0354701097223875\all_results.pickle'
 lin_reg_results = r'C:\Users\Fabian\stanford\gbdt\rsync\.special\linear_regression\all_results.pickle'
 
-target = lin_reg_results
+target = gbdt_w_acs
 
 
 with open(target, 'rb') as f:
