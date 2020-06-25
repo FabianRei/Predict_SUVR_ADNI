@@ -190,7 +190,7 @@ gbdt_no_acs_results = r'C:\Users\Fabian\stanford\gbdt\rsync\.special\1576073951_
 
 ################################################################
 ################################################################
-selected_results = gbdt_no_acs_results
+selected_results = gbdt_results
 # file with additional metadata
 additional_data = r'C:\Users\Fabian\stanford\fed_learning\rsync\fl\rf_data_train_test_crossval_more_trained_activations.pickle'
 # path_detailled_data = r'C:\Users\Fabian\stanford\fed_learning\federated_learning_data\test_meta_data_complete.pickle'
@@ -217,9 +217,10 @@ preds, labs = rearrange_pred_labs(preds, labs, train_test_split)
 subs = more_data['subs']
 t0_suvr = more_data['t0_suvr']
 age = more_data['age']
-weight = more_data['age']
+weight = more_data['weight']
 apoe = more_data['apoe']
 faq = more_data['faqtotal']
+sex = more_data['sex']
 mmse = more_data['mmsescore']
 delta_time = more_data['delta_time']
 # get diagnosis data. Order is same as data above (tested via dia_subs, without t0_data)
@@ -227,6 +228,55 @@ dia_subs = diagnosis_data['subs']
 diagnoses = diagnosis_data['diagnoses']
 t0_diagnoses = diagnosis_data['t0_diagnoses']
 dia_delta_time = diagnosis_data['delta_time']
+
+######################################
+# diagnosis progressors analysis
+dia_filter = diagnoses>-1
+dig_filt = diagnoses[dia_filter]
+delta_dig_filt = dia_delta_time[dia_filter]
+dig_subs_filt = dia_subs[dia_filter]
+
+progressors = []
+all_progressors = 0
+weirdos = []
+weirdo_subs = []
+good_guys = []
+good_subs = []
+
+for s in np.unique(dig_subs_filt):
+    digs = dig_filt[dig_subs_filt==s]
+    delts = delta_dig_filt[dig_subs_filt==s]
+    digs = digs[np.argsort(delts)]
+    if digs.max() >= 0.5 and digs.min() < 0.5 and digs.argmin() < digs.argmax():
+        progressors.append(s)
+        # print(digs)
+    else:
+        progressors.append(-1)
+    if digs.max()-digs.min()>=0.5:
+        all_progressors += 1
+        print(digs)
+    if (np.where(digs==digs.max())[0][0] < np.where(digs==digs.min())[0][-1]) and digs.min()<=digs.max() and digs.max()==0.5:
+        print('weird')
+        weirdos.append(list(digs))
+        weirdo_subs.append(s)
+    if not (np.where(digs==digs.max())[0][0] < np.where(digs==digs.min())[0][-1]) and digs.min()<digs.max() and digs.min()==1:
+        print('good guy')
+        good_guys.append(list(digs))
+        good_subs.append(s)
+progressors = np.array(progressors)
+progressors = progressors[progressors>-1]
+
+
+progressors = np.array(good_subs)
+
+progressor_filter = np.copy(subs)
+for i in range(len(progressor_filter)):
+    if progressor_filter[i] in progressors:
+        progressor_filter[i] = 1
+    else:
+        progressor_filter[i] = 0
+progressor_filter = progressor_filter>0
+
 
 t0_diagnoses = t0_diagnoses[dia_delta_time>0]
 # apoe = apoe[dia_delta_time>0]
@@ -252,8 +302,8 @@ mildly_pos_filter = (t0_suvr>0.79) & (t0_suvr <perc_50pos)
 
 #filter to mildly a-
 perc_50neg =  0.7390000000000001
-mildly_neg_filter = (t0_suvr<0.79) & (t0_suvr > perc_50neg
-                                  )
+mildly_neg_filter = (t0_suvr<0.79) & (t0_suvr > perc_50neg)
+
 severe_pos_filter = t0_suvr >= perc_50pos
 # filter to all cases
 all_filter = t0_suvr > -1
@@ -267,9 +317,14 @@ preds = preds[curr_filter]
 subs = subs[curr_filter]
 t0_suvr = t0_suvr[curr_filter]
 t0_diagnoses = t0_diagnoses[curr_filter]
+progressor_filter = progressor_filter[curr_filter]
 
 # filter for unique subjects:
 _, unique_idxs = np.unique(subs, return_index=True)
+# unique_filter = np.copy(all_filter)
+# unique_filter[unique_idxs] = False
+# unique_filter = ~unique_filter
+
 print(np.mean(labs), np.mean(t0_suvr[unique_idxs]), len(unique_idxs))
 print(f'{len(unique_idxs)} subjects')
 # look at highest suvr amyloid- subjects
@@ -291,7 +346,14 @@ filter_lab, filter_pred, filter_comb = get_matches_target(46, 46, True)
 # visualize_top_changes()
 subjects = to_ampos_subjects(filter_pred)
 filter_lab, filter_pred, filter_comb = get_matches_target(61, 61, True)
+matched_progressors = filter_pred & progressor_filter
+print(f'{len(np.unique(subs[matched_progressors]))} of 52 progressors were matched for {len(np.unique(subs[filter_pred]))} selected subjects')
+interesting = t0_suvr[np.unique(subs[progressor_filter], return_index=True)[1]]
+filter_lab, filter_pred, filter_comb = get_matches_target(122, 122, True)
+matched_progressors = filter_pred & progressor_filter
+print(f'{len(np.unique(subs[matched_progressors]))} of 52 progressors were matched for {len(np.unique(subs[filter_pred]))} selected subjects')
 subjects = to_ampos_subjects(filter_pred)
+
 filter_lab, filter_pred, filter_comb = get_matches_target(30, 30, True)
 filter_lab, filter_pred, filter_comb = get_matches_target(31, 31, True)
 filter_lab, filter_pred, filter_comb = get_matches_target(64, 64, True)
