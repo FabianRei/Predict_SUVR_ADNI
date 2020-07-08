@@ -103,6 +103,7 @@ def get_high_t0suvr_matches(number):
     # print(len(np.unique(sub_ids)), sub_ids)
     return (labs > perc_lab) & (t0_suvr > high_suvr)
 
+
 def get_minimal_change_matches(number):
     global preds
     global labs
@@ -141,7 +142,6 @@ def rmse_over_time():
         time_filter = (delta_time_yrs>=start) & (delta_time_yrs < end)
         time_preds = preds[time_filter]
         time_labs = labs[time_filter]
-        print(len(time_preds))
         results.append(rmse(time_preds, time_labs))
     print(results)
     return 0
@@ -161,7 +161,7 @@ def get_examdate(s, delta_time):
     exam_dates = exam_dates[s1][np.argsort(s2)]
     return exam_dates
 
-def get_diagnosis(s, ex, name='-1', label_name='DXCURREN'):
+def get_diagnosis(s, ex, d_data, name='-1'):
     """
     Looks into the berkeley study csv file and returns the corresponding label.
     If rid+examdate yield more than one corresponding row, it returns -1, as we then cannot find the
@@ -172,16 +172,16 @@ def get_diagnosis(s, ex, name='-1', label_name='DXCURREN'):
     """
     global diagnosis_data
     ts = pd.Timestamp(ex, unit='s')
-    d_data = diagnosis_data['EXAMDATE']
-    d_data = list(d_data)
-    d_results = []
-    for d in d_data:
-        try:
-            d = d.timestamp()
-        except:
-            d = -1
-        d_results.append(d)
-    d_data = np.array(d_results)
+    # d_data = diagnosis_data['EXAMDATE']
+    # d_data = list(d_data)
+    # d_results = []
+    # for d in d_data:
+    #     try:
+    #         d = d.timestamp()
+    #     except:
+    #         d = -1
+    #     d_results.append(d)
+    # d_data = np.array(d_results)
     # d_data = d_data[diagnosis_data['RID'] == s]
     e = ts.timestamp()
     diffs = np.abs(d_data-e)/(3600*24)
@@ -190,19 +190,36 @@ def get_diagnosis(s, ex, name='-1', label_name='DXCURREN'):
     if row_idx.sum() > 1:
         print('more than one result for rid & examdate combination in berkeley study data')
         print(f'file name is {name}, rid is {s}, exam date is {ts}')
-        return -1, -1, -1
+        return -100, -1
     if row_idx.sum() == 0:
         print('no result found for rid & examdate combination in berkeley study data')
         print(f'file name is {name}, rid is {s}, exam date is {ts}')
-        return -1, -1, -1
-    phase = diagnosis_data['Phase'][np.where(row_idx)[0][0]]
-    if phase == 'ADNI1':
-        label = diagnosis_data[label_name][row_idx]
-    elif phase == 'ADNI3':
-        label = diagnosis_data['DIAGNOSIS'][row_idx]
-    else:
-        label = diagnosis_data['DXCHANGE'][row_idx]
-    return int(label), float(diffs[row_idx]), phase
+        return -100, -1
+    label = diagnosis_data['ADNI_MEM'][row_idx]
+    return float(label), float(diffs[row_idx])
+
+
+def get_ed_registry(r, v, u):
+    global not_found_counter
+    # look for examdate in registry, as recommended by ADNI
+    global registry_data
+    row_idx = (registry_data['VISCODE'] == v) & (registry_data['RID'] == r) & (registry_data['USERDATE'] == u)
+    reg_ex_date = registry_data['EXAMDATE'][row_idx]
+    if len(reg_ex_date) > 1:
+        print(len(reg_ex_date))
+        print('not found exactly, using userdate')
+        not_found_counter += 1
+        return u.timestamp()
+    if len(reg_ex_date) < 1:
+        print('not found, using userdate')
+        not_found_counter += 1
+        return u.timestamp()
+    if pd.isnull(reg_ex_date.iloc[0]):
+        print('not found, using userdate')
+        not_found_counter += 1
+        return u.timestamp()
+    reg_ex_date = reg_ex_date.iloc[0].timestamp()
+    return reg_ex_date
 
 
 def create_diagnosis_data():
@@ -228,36 +245,67 @@ def create_diagnosis_data():
     subs = np.append(subs, np.unique(subs))
     exam_dates = np.copy(delta_time)
     diagnoses = np.copy(delta_time)
-    t0_diagnoses = np.copy(delta_time)
     differences = np.copy(delta_time)
-    phases = np.copy(delta_time).astype(np.str)
+    t0_diagnoses = np.copy(delta_time)
+    ex_date = diagnosis_data['EXAMDATE']
+    # name not found dates via -1
+    ex_data = []
+    for d in ex_date:
+        try:
+            d = d.timestamp()
+        except:
+            d = -1
+        ex_data.append(d)
+    ex_rid = diagnosis_data['RID']
+    ex_vis = diagnosis_data['VISCODE']
+    ex_us = diagnosis_data['USERDATE']
+    new_ex_data = ex_data.copy()
+
+    # fill in exam dates extracted from registry metadata
+    for i, (ed, r, v, u) in enumerate(zip(ex_data, ex_rid, ex_vis, ex_us)):
+        if ed == -1:
+            ex_date = get_ed_registry(r, v, u)
+            new_ex_data[i] = ex_date
+    new_ex_data = np.array(new_ex_data)
+
+    # search for diagnosis
     found = []
+    found_t0 = []
     for s in np.unique(subs):
         # delta time is to order correctly. Needed to put exam_data on the correct spot.
         ex = get_examdate(s, delta_time)
         digs = []
         diffs = []
-        phs = []
         for e in ex:
-            dig, diff, ph = get_diagnosis(s, e)
+            dig, diff = get_diagnosis(s, e, new_ex_data)
             digs.append(dig)
             diffs.append(diff)
-            phs.append(ph)
-        if min(digs) == -1:
+        if min(digs)==-1:
             found.append(-1)
         else:
             found.append(1)
+        if digs[ex.argmin()] == -1:
+            found_t0.append(0)
+        else:
+            found_t0.append(1)
         exam_dates[subs==s] = ex
         diagnoses[subs==s] = digs
         differences[subs==s] = diffs
-        phases[subs==s] = phs
-        t0_diagnoses[subs==s] = digs[np.argmin(ex)]
-
+        t0_diagnoses[subs==s] = digs[ex.argmin()]
     found = np.array(found)
-    results = {'diagnoses': diagnoses, 'differences': differences, 'phases': phases, 'subs': subs, 'suvr': suvr,
-               't0_suvr': t0_suvr, 'exam_dates': exam_dates, 'delta_time': delta_time, 'delta_suvr': delta_suvr, 't0_diagnoses': t0_diagnoses}
-    with open(os.path.join(output_folder, 'diagnoses_DXSUM.pickle'), 'wb') as f:
+    found_t0 = np.array(found_t0)
+    diagnoses[pd.isna(diagnoses)] = -100
+    output_folder = r'C:\Users\Fabian\stanford'
+    results = {'ADNI_MEM': diagnoses, 'differences': differences, 'subs': subs, 'suvr': suvr,
+               't0_suvr': t0_suvr, 'exam_dates': exam_dates, 'delta_time': delta_time, 'delta_suvr': delta_suvr, 'found_subject': found,
+               't0_ADNI_MEM': t0_diagnoses, 'found_t0': found_t0}
+    with open(os.path.join(output_folder, 'diagnoses_PSYCHSUM.pickle'), 'wb') as f:
         pickle.dump(results, f)
+    # just for analysis purposes..
+    t, idxs = np.unique(subs, return_index=True)
+    t = t0_diagnoses[idxs]
+    t = t[t>-100]
+
     print('nice')
 
 
@@ -265,13 +313,15 @@ def create_diagnosis_data():
 target_folder = r'C:\Users\Fabian\stanford\gbdt\analysis'
 target_file = 'all_results.pickle'
 folders = glob(os.path.join(target_folder, '157*'))
-output_folder = r'C:\Users\Fabian\stanford'
 
+
+# select GBDT predictions in folder
 folder = folders[-1]
 target = os.path.join(folder, target_file)
 with open(target, 'rb') as f:
     data = pickle.load(f)
 
+# load additional data
 in_path = r'C:\Users\Fabian\stanford\fed_learning\rsync\fl\rf_data_train_test_crossval.pickle'
 with open(in_path, 'rb') as f:
     more_data = pickle.load(f)
@@ -280,10 +330,13 @@ path_detailled_data = r'C:\Users\Fabian\stanford\fed_learning\federated_learning
 with open(path_detailled_data, 'rb') as f:
     detailled_data = pickle.load(f)
 
-diagnosis_csv = r'C:\Users\Fabian\stanford\DXSUM_PDXCONV_ADNIALL.csv'
-diagnosis_data = pd.read_csv(diagnosis_csv, parse_dates=['EXAMDATE'])
+diagnosis_csv = r'C:\Users\Fabian\stanford\UWNPSYCHSUM_03_26_20.csv'
+diagnosis_data = pd.read_csv(diagnosis_csv, parse_dates=['EXAMDATE', 'USERDATE'])
 
+registry_csv = r'C:\Users\Fabian\stanford\REGISTRY.csv'
+registry_data = pd.read_csv(registry_csv, parse_dates=['EXAMDATE', 'USERDATE'])
 
+# get data as variables
 gbms = data['gbm']
 x_names = data['x_names']
 preds = data['predictions']
@@ -305,38 +358,8 @@ suvr = more_data['suvr']
 extra_subs = detailled_data['sub_id']
 extra_exam_date = detailled_data['exam_date']
 
-
+#########################################
+# get diagnosis data
+#########################################
+not_found_counter = 0
 create_diagnosis_data()
-sort_idxs = np.argsort(preds)[::-1]
-sort_idxs2 = np.argsort(labs)[::-1]
-print(sort_idxs[:25])
-print(labs[sort_idxs][:25])
-print(preds[sort_idxs][:25])
-perc = np.percentile(preds, 100-2500/1137)
-perc2 = np.percentile(labs, 100-2500/1137)
-big_preds = preds[preds>perc]
-big_labs = labs[labs>perc2]
-big_pred_labs = labs[preds>perc]
-fis = []
-# get_high_t0suvr_matches(116)
-for i in range(10, 101, 10):
-    print(len(np.unique(subs[get_matches_target(i, 100)]))/i)
-get_matches(100)
-print(np.sum((labs>perc2) & (preds>perc)))
-filter = get_matches(100)
-_, sub_filter = np.unique(subs, return_index=True)
-rmse_over_time()
-for gbm in gbms:
-    fis.append(gbm.feature_importance())
-fi = fis[0]
-for f in fis[1:]:
-    fi += f
-fi = (fi/5).astype(np.int)
-
-f_names = []
-f_names = list(x_names)
-for i in range(len(fi)-len(x_names)):
-    f_names.append(f'act_{i}')
-f_names = np.array(f_names)
-
-print('done')

@@ -38,15 +38,21 @@ def mixed_lm_crossval(data, cval_fold=5):
             data['faqtotal'][data['faqtotal'] == -1] = np.mean(data['faqtotal'][~test][data['faqtotal'][~test] != -1])
         if 'mmsescore' in keys:
             data['mmsescore'][data['mmsescore'] == -1] = np.mean(data['mmsescore'][~test][data['mmsescore'][~test] != -1])
-        independent_var = np.column_stack((data['t0_suvr'], data['sex'], data['weight'], data['delta_time'],
-                                           data['mmsescore'], data['faqtotal'], data['age'],
-                                           data['apoe_0'], data['apoe_1'], data['apoe_2'], data['apoe_3'], data['apoe_4'], data['apoe_5']))
+        # independent_var = np.column_stack((data['t0_suvr'], data['sex'], data['weight'], data['delta_time'],
+        #                                    data['mmsescore'], data['faqtotal'], data['age'],
+        #                                    data['apoe_0'], data['apoe_1'], data['apoe_2'], data['apoe_3'], data['apoe_4'], data['apoe_5']))
+        # for statistical data analysis:
+        independent_var = np.column_stack(
+            (data['t0_suvr']/data['t0_suvr'].mean(), data['sex'], data['weight']/data['weight'].mean(), data['delta_time']/data['delta_time'].mean(),
+             data['mmsescore']/data['mmsescore'].mean(), data['faqtotal']/data['faqtotal'].mean(), data['age']/data['age'].mean(),
+             data['apoe_0'], data['apoe_1'], data['apoe_2'], data['apoe_3'], data['apoe_4'], data['apoe_5']))
         dep_test = dependent_var[test]
         indep_test = independent_var[test]
         dep_train = dependent_var[~test]
         indep_train = independent_var[~test]
         model = sm.OLS(dep_train, indep_train)
         results = model.fit()
+
         dep_test_pred = model.predict(params=results.params, exog=indep_test)
         dep_train_pred = model.predict(params=results.params, exog=indep_train)
         print(rmse(dep_test_pred, dep_test))
@@ -79,6 +85,8 @@ with open(data_path, 'rb') as f:
 
 print(data.keys())
 mixed_lm_crossval(data)
+
+
 # pd_data = pd.DataFrame(data)
 #
 # md = smf.mixedlm("delta_suvr ~ delta_time + a1_e4 + a2_e4 + weight_meaned + amyloid_status + t0_suvr + sex_f_true", pd_data, groups=pd_data['img_id'])
