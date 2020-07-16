@@ -8,19 +8,27 @@ import pandas as pd
 import os
 import time
 import pprint
+from glob import glob
 
 
 def rmse(target, prediction):
     return mean_squared_error(target, prediction) ** 0.5
 
+
 def get_num(x):
     return float(x[0])
 
-def get_stroke_xy(data, stroke_keys, group_mrs=False, delta=False):
+
+def average_pool(x):
+    return np.mean(x.reshape(-1, 8*8), axis=1)
+
+
+def get_stroke_xy(data, stroke_keys, group_mrs=False, delta=False, activations=None, include_activations=False):
     # get relevant data
     arrs = []
     y = np.array(data['mrs'])
     dep_not_nan_filter = ~pd.isna(y)
+    subject_ids = np.array(data['subject'])[dep_not_nan_filter]
     for k in stroke_keys:
         arr = np.array(data[k])
         not_nan_filt = ~pd.isna(arr)
@@ -60,6 +68,21 @@ def get_stroke_xy(data, stroke_keys, group_mrs=False, delta=False):
         old_mrs = old_mrs[dep_not_nan_filter]
         old_mrs[pd.isna(old_mrs)] = 0
         y -= old_mrs
+
+    # include activations in trainin data (x)
+    if activations is not None:
+        ac_ids = np.array([int(id) for id in activations.keys()])
+        ac_filter = np.in1d(ac_ids, subject_ids)
+        sub_filter = np.in1d(subject_ids, ac_ids)
+        x = x[sub_filter]
+        y = y[sub_filter]
+        if include_activations:
+            acs = [average_pool(v) for v in activations.values()]
+            acs = np.stack(acs)
+            acs = acs[ac_filter]
+            x = np.concatenate((x, acs), axis=1)
+        # print('activations added to train data')
+
     # fabricate train_test_split
     train_test_split = []
     gen = train_test_gen(5)
@@ -83,8 +106,14 @@ def train_test_gen(nums):
             yield i
 
 
-def save_results(res):
-    global path_output
+def save_results(res, output_path):
+    numbering = str(len(glob(output_path + '\\*'))+1).zfill(3)
+    acc = np.mean(res['accuracy+-1'])
+    rmse = np.mean(res['rmse'])
+    folder_name = f'{numbering}_acc+-1_{acc:.4f}_rmse_{rmse:.4f}'
+    path_output = os.path.join(output_path, folder_name)
+    os.makedirs(path_output)
+
     res_csv = {'RMSE_TRAIN': res['rmse_train'], 'RMSE_TEST': res['rmse'], 'ACC': res['accuracy'],
                'ACC_+-1': res['accuracy+-1'], 'ACC_+-2': res['accuracy+-2']}
     res_csv = pd.DataFrame.from_dict(res_csv)
@@ -99,10 +128,11 @@ def save_results(res):
     print('nice')
 
 
-def cross_validation_gbdt(data, params, cval_range=5, exclude='', extra_folder='', group_mrs=False, delta=False):
+def cross_validation_gbdt(data, params, cval_range=5, exclude='', extra_folder='', group_mrs=False, delta=False, stroke_keys=None,
+                          output_path=None, activations=None, include_activations=False):
     params['verbose'] = -1
-    x, y, train_test_split, x_names = get_stroke_xy(data, stroke_keys, group_mrs=group_mrs, delta=delta)
-
+    x, y, train_test_split, x_names = get_stroke_xy(data, stroke_keys, group_mrs=group_mrs, delta=delta, activations=activations, include_activations=include_activations)
+    print('got stroke xy')
     res = {'predictions': [], 'labels': [], 'rmse': [], 'pred_train': [], 'labels_train': [],
            'rmse_train': [], 'accuracy': [], 'accuracy+-1': [], 'accuracy+-2': [], 'gbm': []}
 
@@ -144,6 +174,8 @@ def cross_validation_gbdt(data, params, cval_range=5, exclude='', extra_folder='
         res['pred_train'].append(y_pred_train)
         res['labels_train'].append(y_train)
         res['gbm'].append(gbm)
+        res['rmse_train'].append(rmse(y_pred_train, y_train))
+        res['rmse'].append(rmse(y_pred, y_test))
         if not params['objective'] == 'multiclass':
             print(rmse(y_test, y_pred))
             print(rmse(y_train, y_pred_train))
@@ -158,69 +190,6 @@ def cross_validation_gbdt(data, params, cval_range=5, exclude='', extra_folder='
     res['train_test_split'] = train_test_split
     print(np.mean(res['accuracy']))
     print(np.mean(res['accuracy+-1']))
-    save_results(res)
+    if output_path is not None:
+        save_results(res, output_path)
     return res
-
-
-path_csv = r'C:\Users\Fabian\Desktop\sample_lesion\tabular_data2.csv'
-path_output = r'C:\Users\Fabian\Desktop\sample_lesion'
-np.random.seed(42)
-
-data = pd.read_csv(path_csv)
-keys = np.array(data.keys())
-dep_key = keys[3]
-indep_keys = np.concatenate((keys[2:3], keys[4:]))
-
-stroke_keys = ['lesion volume', 'age', 'baselinenihssscore', 'priorstroketia', 'treatment', 'tpa', 'male', 'myocardialinfarction',
-             'hypertension', 'atrialfibrillation', 'hypercholesterolemia', 'diabetes', 'haspatienteverhadastrokepriortoq',
-             'pre-eventrankin', '1a. Level of Consciousness', '1b. LOC Questions', '1c. LOC Commands ',
-             '2. Best Gaze', '3. Visual Fields', '4. Facial Palsy', '5a. Motor: Left Arm', '5b. Motor: Right Arm', '6a. Motor: Left leg',
-             '6b. Motor: Right Leg', '7. Limb Ataxia', '8. Sensory', '9. Best Language', '10. Dysarthria', '11. Extinction and Inattention',
-             'Initial Systolic Blood Pressure on arrival at STUDY SITE', 'Initial Diastolic Blood Pressure on arrival at STUDY SITE',
-             'Glucose']
-
-
-stroke_keys += ['tci_num', 'onset_to_imaging', 'image_to_dsa', 'image_to_eariest_treat']
-
-x, y, train_test_split, x_names = get_stroke_xy(data, stroke_keys)
-# params = {
-#     'boosting_type': 'gbdt',
-#     'objective': 'multiclass', # default is 'multiclass'
-#     'num_classes': 3,
-#     # 'objective': 'regression', # default is 'regression'
-#     # 'metric': 'mse',
-#     'max_leaves': 50, #default is 50
-#     'max_depth': 5,  # 9 optimal for activations, 4 optimal for metadata only
-#     'max_bin': 255, # default is 255
-#     'num_iterations': 4000,
-#     'learning_rate': 0.0005,  # 0.0006 optimal for metadata, 0.0045 for activations
-#     'feature_fraction': 0.8, # 0.8 for metadata only
-#     'bagging_fraction': 0.5,
-#     'bagging_freq': 2,
-#     'verbose': 0,
-#     'min_data_in_leaf': 25 # default is 9
-# }
-
-params = {
-    'boosting_type': 'gbdt',
-    # 'objective': 'multiclass', # default is 'multiclass'
-    # 'num_classes': 3,
-    'objective': 'regression', # default is 'regression'
-    'metric': 'mse',
-    'max_leaves': 200, #default is 50
-    'max_depth': 4,  # 9 optimal for activations, 4 optimal for metadata only
-    'max_bin': 255, # default is 255
-    'num_iterations': 4000,
-    'learning_rate': 0.0015,  # 0.0006 optimal for metadata, 0.0045 for activations
-    'feature_fraction': 0.8, # 0.8 for metadata only
-    'bagging_fraction': 0.5,
-    'bagging_freq': 2,
-    'verbose': 0,
-    'min_data_in_leaf': 33 # default is 9
-}
-
-cat_features = list(range(len(stroke_keys)))
-
-# params['categorical_feature'] = cat_features[3:]
-cross_validation_gbdt(data, params, group_mrs=False, delta=True)
-print('db')
