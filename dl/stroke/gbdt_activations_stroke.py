@@ -1,3 +1,13 @@
+if __name__ == '__main__':
+    import inspect
+    import sys
+    import os
+    current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+    parent_dir = os.path.dirname(current_dir)
+    parent_dir = os.path.dirname(parent_dir)
+    print(parent_dir)
+    sys.path.insert(0, parent_dir)
+
 from dl.stroke.stroke_gbdt import *
 
 
