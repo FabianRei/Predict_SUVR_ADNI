@@ -64,16 +64,16 @@ params = {
     # 'num_classes': 3,
     'objective': 'regression', # default is 'regression'
     'metric': 'mse',
-    'max_leaves': 200, #default is 50
-    'max_depth': 4,  # 9 optimal for activations, 4 optimal for metadata only
+    'max_leaves': 50, #default is 50, recently at 200
+    'max_depth': 10,  # 9 optimal for activations, 4 optimal for metadata only
     'max_bin': 255, # default is 255
     'num_iterations': 4000,
-    'learning_rate': 0.0015,  # 0.0006 optimal for metadata, 0.0045 for activations
+    'learning_rate': 0.0045,  # 0.0006 optimal for metadata, 0.0045 for activations, recently at 0.0015
     'feature_fraction': 0.8, # 0.8 for metadata only
     'bagging_fraction': 0.5,
     'bagging_freq': 2,
     'verbose': 0,
-    'min_data_in_leaf': 33 # default is 9
+    'min_data_in_leaf': 9 # default is 9
 }
 
 
