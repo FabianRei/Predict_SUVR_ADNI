@@ -19,8 +19,10 @@ def get_num(x):
     return float(x[0])
 
 
-def average_pool(x):
-    return np.mean(x.reshape(-1, 8*8), axis=1)
+def average_pool(x, average_slices=False):
+    if average_slices:
+        x = np.mean(x, axis=1)
+    return np.mean(x.T.reshape(-1, 8*8), axis=1)
 
 
 def get_stroke_xy(data, stroke_keys, group_mrs=False, delta=False, activations=None, include_activations=False):
