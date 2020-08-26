@@ -38,7 +38,7 @@ def train_h5(h5_path, num_epochs=30, label_names=None, extra_info='', lr=0.01, d
              threshold=1.11):
     windows_db = os.name == 'nt'
     if windows_db:
-        h5_path = r'C:\Users\Fabian\stanford\fed_learning\federated_learning_data\slice_data_prediction.h5'
+        h5_path = r'C:\Users\Fabian\stanford\fed_learning\federated_learning_data\slice_data_longitudinal_fixed.h5'
 
     # chose random when -1, otherwise the selected id
     if gpu_device < 0:

@@ -20,7 +20,7 @@ def get_pickle_fn(pickle_fnames, id):
             return fn
 
 
-windows_db = False
+windows_db = True
 
 if windows_db:
     fpath = r'C:\Users\Fabian\stanford\fed_learning\federated_learning_data\trial_sample'
@@ -40,8 +40,11 @@ pickle_path = os.path.join(fpath, 'xml_labels_detailled_suvr_longitudinal_times_
 with open(pickle_path, 'rb') as p:
     pdata = pickle.load(p)
 
+
 pickle_fnames = list(pdata.keys())
 nifti_files = glob(f'{nifti_path}/**/*.nii', recursive=True)
+
+
 
 sizes = []
 h5_file = h5py.File(os.path.join(outpath, 'slice_data_longitudinal_fixed.h5'), 'w')

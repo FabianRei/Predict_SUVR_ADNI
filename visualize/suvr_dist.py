@@ -10,7 +10,8 @@ import pickle
 suvr_data_anal = True
 
 if suvr_data_anal:
-    fpath = r'C:\Users\Fabian\stanford\fed_learning\rsync\slice_data_subj.h5'
+    # fpath = r'C:\Users\Fabian\stanford\fed_learning\rsync\slice_data_subj.h5'
+    fpath = r'C:\Users\Fabian\stanford\fed_learning\federated_learning_data\slice_data_longitudinal_fixed.h5'
     data = h5py.File(fpath, 'r')
     scanners = []
     amyloid = []
@@ -31,7 +32,7 @@ if suvr_data_anal:
         # names.append(k)
         # slices.append(v['slices'])
         site.append(v['site'])
-        suvr.append(v['label_suvr'])
+        suvr.append(v['label_0_79_suvr'])
         # subject_ids.append(v['rid'])
 
 
@@ -50,8 +51,10 @@ if suvr_data_anal:
     density._compute_covariance()
     plt.plot(xs,density(xs))
     plt.clf()
-    plt.grid(which='both')
+    # plt.grid(which='both')
     plt.hist(suvr, bins=200)
+    plt.xlabel('Composite SUVR')
+    plt.ylabel('Frequency')
     fname = os.path.join(os.path.dirname(fpath), 'SVUR_dist.png')
     plt.savefig(fname, dpi=200)
     plt.show()

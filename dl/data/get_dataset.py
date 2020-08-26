@@ -27,6 +27,16 @@ def get_dataset(h5_path, label_names=['label_amyloid'], limit=-1, include_subjec
 
 if __name__ == '__main__':
     fp = r'C:\Users\Fabian\stanford\fed_learning\federated_learning_data\slice_data.h5'
+    fp = r'C:\Users\Fabian\stanford\fed_learning\federated_learning_data\slice_data_prediction.h5'
+    # data analysis
+    data = h5py.File(fp, 'r')
+    # data analysis
+    pickle_fnames = list(data.keys())
+    sub_ids = []
+    train_data = []
+    for n in pickle_fnames:
+        sub_ids.append(data[n].attrs['rid'])
+        train_data.append(data[n].attrs['train_data'])
     # dset, labels = get_dataset(fp)
     dset, l1, l2 = get_dataset(fp, label_names=['label_amyloid', 'label_suvr'])
     out_path = r'C:\Users\Fabian\stanford\fed_learning\rsync\fl'
